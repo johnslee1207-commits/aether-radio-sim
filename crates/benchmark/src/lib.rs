@@ -1,9 +1,17 @@
 //! Benchmark result aggregation and end-to-end simulation harness.
 //! Tunables load from `configs/bench_profile.yaml` and related data files.
 
+mod acceptance;
+mod fault_drill;
 mod pipeline;
+mod soak;
 
+pub use acceptance::{
+    AcceptanceError, AcceptanceProfile, AcceptanceReport, AcceptanceRunner, GateResult,
+};
+pub use fault_drill::{FaultDrillError, FaultDrillProfile, FaultDrillReport, FaultDrillRunner};
 pub use pipeline::{BenchProfile, PipelineBench, PipelineBenchError};
+pub use soak::{SoakError, SoakGate, SoakProfile, SoakReport, SoakRunner};
 
 use serde::{Deserialize, Serialize};
 
@@ -39,6 +47,10 @@ pub struct BenchReport {
     pub sequence_gaps: u64,
     pub late_packets: u64,
     pub sim_duration_ns: u64,
+    #[serde(default)]
+    pub recovery_actions: u64,
+    #[serde(default)]
+    pub ring_occupancy_peak: u64,
 }
 
 impl LatencyStats {

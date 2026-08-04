@@ -187,6 +187,18 @@ impl GpuRingBuffer {
     pub fn count_state(&self, state: BufferState) -> usize {
         self.slots.iter().filter(|s| s.state == state).count()
     }
+
+    /// Non-free slots (ring occupancy for metrics).
+    pub fn occupied(&self) -> usize {
+        self.slots
+            .iter()
+            .filter(|s| s.state != BufferState::Free)
+            .count()
+    }
+
+    pub fn slot_bytes(&self) -> usize {
+        self.slot_bytes
+    }
 }
 
 #[cfg(test)]

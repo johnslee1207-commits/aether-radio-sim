@@ -1,0 +1,11 @@
+version: "1.0.0"
+id: fault-drill-default
+classification: project_specific
+description: Short fault drill — stress faults + recovery policy exercise
+bench_profile: configs/bench_profile.yaml
+fault_config: configs/fault_injection_stress.yaml
+recovery_policy: configs/ops/recovery_policy.yaml
+symbol_count: 48
+streams: 1
+report_path: data/reports/fault_drill_last.json
+events_path: data/reports/fault_drill_events.jsonl

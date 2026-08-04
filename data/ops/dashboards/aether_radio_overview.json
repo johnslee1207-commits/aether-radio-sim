@@ -1,0 +1,128 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Health state",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "aether_health_state{job=\"aether-sim\"}",
+          "refId": "A"
+        }
+      ],
+      "description": "0=NORMAL 1=WARNING 2=DEGRADED 3=FAILED 4=RECOVERY"
+    },
+    {
+      "title": "Link up",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "aether_link_up{job=\"aether-sim\"}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "RX / TX packets",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "rate(aether_transport_rx_packets{job=\"aether-sim\"}[1m])",
+          "legendFormat": "rx pps",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(aether_transport_tx_packets{job=\"aether-sim\"}[1m])",
+          "legendFormat": "tx pps",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "Latency last / max (ns)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "aether_transport_latency_last_ns{job=\"aether-sim\"}",
+          "legendFormat": "last",
+          "refId": "A"
+        },
+        {
+          "expr": "aether_transport_latency_max_ns{job=\"aether-sim\"}",
+          "legendFormat": "max",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "Sequence gaps / late / drops",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "aether_transport_gap_count{job=\"aether-sim\"}",
+          "legendFormat": "gaps",
+          "refId": "A"
+        },
+        {
+          "expr": "aether_transport_late_packets{job=\"aether-sim\"}",
+          "legendFormat": "late",
+          "refId": "B"
+        },
+        {
+          "expr": "aether_transport_drop{job=\"aether-sim\"}",
+          "legendFormat": "drop",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "title": "Radio deadline miss / symbols",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "expr": "aether_radio_deadline_miss{job=\"aether-sim\"}",
+          "legendFormat": "deadline_miss",
+          "refId": "A"
+        },
+        {
+          "expr": "aether_radio_symbol_received{job=\"aether-sim\"}",
+          "legendFormat": "symbols",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "title": "GPU kernel latency (ns)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "expr": "aether_compute_kernel_latency_ns{job=\"aether-sim\"}",
+          "legendFormat": "kernel_ns",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["aether-radio", "observability"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
+  "timezone": "browser",
+  "title": "Aether Radio Data Plane — Overview",
+  "uid": "aether-radio-overview",
+  "version": 1
+}

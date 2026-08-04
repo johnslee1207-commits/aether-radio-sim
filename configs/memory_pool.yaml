@@ -1,0 +1,10 @@
+version: "1.0.0"
+id: memory-pool-default
+classification: project_specific
+description: Host/GPU buffer pool limits and H2D/D2H transfer model
+host_pool_bytes: 67108864
+gpu_pool_bytes: 67108864
+max_buffers: 4096
+h2d_bandwidth_gbps: 16.0
+d2h_bandwidth_gbps: 16.0
+fixed_copy_latency_ns: 200

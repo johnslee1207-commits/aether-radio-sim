@@ -38,6 +38,43 @@ enum Commands {
         #[arg(long, default_value = "configs/bench_profile.yaml")]
         profile: PathBuf,
     },
+    /// Run acceptance gates (ethernet model + PipelineBench SLA)
+    Accept {
+        #[arg(long, default_value = "configs/acceptance_profile.yaml")]
+        profile: PathBuf,
+    },
+    /// Print observability plane status (metrics layers / health / ops config)
+    OpsStatus {
+        #[arg(long, default_value = "configs/ops/observability.yaml")]
+        ops_config: PathBuf,
+    },
+    /// L4 soak / stress run (Ops Framework)
+    Soak {
+        #[arg(long, default_value = "configs/soak_profile.yaml")]
+        profile: PathBuf,
+    },
+    /// Dump layered metrics as Prometheus text (mock exporter)
+    PromDump {
+        #[arg(long, default_value = "data/reports/metrics.prom")]
+        out: PathBuf,
+        #[arg(long, default_value = "configs/bench_profile.yaml")]
+        bench_profile: PathBuf,
+        #[arg(long, default_value = "aether-sim")]
+        job: String,
+    },
+    /// Serve Prometheus text over HTTP (ops scrape; binds per configs/ops)
+    PromServe {
+        #[arg(long, default_value = "configs/ops/prometheus_scrape.yaml")]
+        config: PathBuf,
+        /// Exit after serving one successful /metrics scrape
+        #[arg(long, default_value_t = false)]
+        once: bool,
+    },
+    /// Fault drill: stress faults + recovery policy
+    FaultDrill {
+        #[arg(long, default_value = "configs/fault_drill.yaml")]
+        profile: PathBuf,
+    },
     /// List CUDA devices (requires `--features cuda`)
     GpuInfo,
     /// Smoke path using real CUDA GpuBackend (requires `--features cuda`)
@@ -128,6 +165,28 @@ async fn main() -> Result<()> {
         Commands::Bench { profile } => {
             run_bench(&profile)?;
         }
+        Commands::Accept { profile } => {
+            run_accept(&profile)?;
+        }
+        Commands::OpsStatus { ops_config } => {
+            run_ops_status(&ops_config)?;
+        }
+        Commands::Soak { profile } => {
+            run_soak(&profile)?;
+        }
+        Commands::PromDump {
+            out,
+            bench_profile,
+            job,
+        } => {
+            run_prom_dump(&out, &bench_profile, &job)?;
+        }
+        Commands::PromServe { config, once } => {
+            run_prom_serve(&config, once)?;
+        }
+        Commands::FaultDrill { profile } => {
+            run_fault_drill(&profile)?;
+        }
         Commands::GpuInfo => {
             run_gpu_info()?;
         }
@@ -198,10 +257,28 @@ fn run_smoke(profile: &PathBuf) -> Result<()> {
     use cx5_emulator::{Cx5Nic, PacketIO};
     use fpga_emulator::{FpgaEmulator, RadioTimingConfig};
     use gpu_runtime::GpuRingBuffer;
-    use metrics_engine::MetricsEngine;
+    use metrics_engine::{
+        taxonomy, EventLogger, HealthManager, HealthThresholds, LogEvent, MetricsBackend,
+        MetricsEngine, ObservabilityConfig, TraceEngine, TraceStage,
+    };
 
     let _profile_text = fs::read_to_string(profile)
         .with_context(|| format!("read profile {}", profile.display()))?;
+
+    let ops = ObservabilityConfig::load_path("configs/ops/observability.yaml")
+        .context("load configs/ops/observability.yaml")?;
+    let mut events = EventLogger::create(&ops.logging.events_path)?;
+    let _ = events.emit(
+        &LogEvent::now(taxonomy::RUNTIME_STARTED)
+            .with_component("cli")
+            .with_detail("smoke"),
+    );
+
+    let mut trace = TraceEngine::from_config(
+        true, // smoke always traces one packet for observability gate
+        ops.trace.ring_capacity.min(64),
+        &ops.trace.export_path,
+    );
 
     let timing = RadioTimingConfig::from_yaml_str(
         &fs::read_to_string("configs/radio_timing.yaml")
@@ -212,6 +289,7 @@ fn run_smoke(profile: &PathBuf) -> Result<()> {
     let mut fpga = FpgaEmulator::new(timing, StreamId(1));
     let mut transport = SimTransportEngine::from_yaml(&deadline_yaml)?;
     transport.link_up()?;
+    let _ = events.emit(&LogEvent::now(taxonomy::LINK_UP).with_component("transport"));
     transport.create_stream(StreamConfig {
         stream_id: StreamId(1),
         carrier: 0,
@@ -219,15 +297,27 @@ fn run_smoke(profile: &PathBuf) -> Result<()> {
         qos: 0,
         deadline_ns: 10_000,
     })?;
+    let _ = events.emit(
+        &LogEvent::now(taxonomy::STREAM_CREATE)
+            .with_component("transport")
+            .with_stream(1),
+    );
     transport.start_stream(StreamId(1))?;
 
     let packet = fpga.emit_symbol();
+    let tid = trace.start(
+        packet.stream_id.0,
+        packet.sequence.0,
+        TraceStage::FpgaTx,
+        packet.timestamp.0,
+    );
     let mut now = packet.timestamp.0;
     transport.now_ns = now + 10_000;
     transport.ingest(packet)?;
     let packet = transport
         .receive()?
         .context("expected ingested packet on receive")?;
+    trace.stamp(tid, TraceStage::Cx5Rx, now + 10_000);
 
     let mut nic = Cx5Nic::from_yaml(
         &fs::read_to_string("configs/nic_dma.yaml").context("read configs/nic_dma.yaml")?,
@@ -236,27 +326,260 @@ fn run_smoke(profile: &PathBuf) -> Result<()> {
     nic.submit_rx(packet)?;
     now += nic.dma_latency_ns();
     nic.advance_time(now);
+    trace.stamp(tid, TraceStage::DmaDone, now);
 
     let mut ring = GpuRingBuffer::from_yaml(
         &fs::read_to_string("configs/gpu_ring.yaml").context("read configs/gpu_ring.yaml")?,
     )?;
     let mut metrics = MetricsEngine::new();
+    metrics.set_link_up(true, 100.0);
 
     for pkt in nic.rx_burst(32) {
-        metrics.record_rx();
+        metrics.record_rx_bytes(pkt.payload.len() as u64);
+        metrics.record_symbol();
+        trace.stamp(tid, TraceStage::GpuEnqueue, now);
         let latency = ring.process_packet(&pkt.payload, now)?;
         now += latency;
-        metrics.record_tx();
+        metrics.record_kernel_ns(latency);
+        metrics.record_tx_bytes(pkt.payload.len() as u64);
+        metrics.record_latency_sample(latency);
+        trace.stamp(tid, TraceStage::CudaDone, now);
+        let _ = events.emit(
+            &LogEvent::now(taxonomy::PACKET_RX)
+                .with_component("gpu_ring")
+                .with_stream(pkt.stream_id.0)
+                .with_sequence(pkt.sequence.0)
+                .with_latency_us(latency as f64 / 1_000.0),
+        );
     }
 
+    let health_thr = HealthThresholds::load_path(&ops.health.policy_path).unwrap_or_default();
+    let mut health = HealthManager::new(health_thr);
+    let _ = health.evaluate(&metrics.layered_snapshot(), Some(&mut events));
+    let _ = events.flush();
+    let exported = trace.export_configured().unwrap_or(0);
+
     println!(
-        "smoke ok: rx={} tx={} now_ns={} seq_gaps={} late={} metrics={}",
+        "smoke ok: rx={} tx={} now_ns={} seq_gaps={} late={} health={} traces_exported={} metrics={}",
         metrics.snapshot().link.rx_packets,
         metrics.snapshot().link.tx_packets,
         now,
         transport.sequence_gaps,
         transport.late_packets,
+        health.state().as_str(),
+        exported,
         metrics.to_json()
+    );
+    println!("layered: {}", metrics.to_layered_json());
+    println!("events: {}", events.path);
+    Ok(())
+}
+
+fn run_ops_status(ops_config: &PathBuf) -> Result<()> {
+    use metrics_engine::{HealthThresholds, ObservabilityConfig};
+
+    let ops = ObservabilityConfig::load_path(ops_config)
+        .with_context(|| format!("load {}", ops_config.display()))?;
+    let health = HealthThresholds::load_path(&ops.health.policy_path)
+        .with_context(|| format!("load {}", ops.health.policy_path))?;
+    println!("ops config: {}", ops.id);
+    println!(
+        "metrics.enabled={} export_json={} prometheus_text={}",
+        ops.metrics.enabled, ops.metrics.export_json, ops.metrics.export_prometheus_text
+    );
+    println!(
+        "logging.events_path={} level={}",
+        ops.logging.events_path, ops.logging.default_level
+    );
+    println!(
+        "trace.enabled={} ring={} export={}",
+        ops.trace.enabled, ops.trace.ring_capacity, ops.trace.export_path
+    );
+    println!(
+        "health.max_latency_p99_ns={} max_seq_gap={}",
+        health.max_latency_p99_ns, health.max_seq_gap_per_window
+    );
+    println!("recovery.policy_path={}", ops.recovery.policy_path);
+    println!(
+        "prometheus_scrape.config_path={}",
+        ops.prometheus_scrape.config_path
+    );
+    Ok(())
+}
+
+fn run_soak(profile_path: &PathBuf) -> Result<()> {
+    use benchmark::{SoakProfile, SoakRunner};
+
+    let profile = SoakProfile::load_path(profile_path)
+        .with_context(|| format!("load {}", profile_path.display()))?;
+    match SoakRunner::new(profile).with_base_dir(".").run() {
+        Ok(report) => {
+            println!("{}", serde_json::to_string_pretty(&report)?);
+            println!(
+                "soak ok: profile={} packets={}",
+                report.profile_id, report.bench.packets
+            );
+            Ok(())
+        }
+        Err(benchmark::SoakError::Failed(report)) => {
+            println!("{}", serde_json::to_string_pretty(&*report)?);
+            anyhow::bail!("soak failed: profile={}", report.profile_id);
+        }
+        Err(e) => Err(e.into()),
+    }
+}
+
+fn run_prom_dump(out: &PathBuf, bench_profile: &PathBuf, job: &str) -> Result<()> {
+    use benchmark::{BenchProfile, PipelineBench};
+    use metrics_engine::{render_prometheus_text, HealthManager, HealthThresholds};
+
+    let mut profile = BenchProfile::load_path(bench_profile)
+        .with_context(|| format!("load {}", bench_profile.display()))?;
+    profile.symbol_count = profile.symbol_count.min(32);
+    let (report, metrics) = PipelineBench::new(profile)
+        .with_base_dir(".")
+        .run()
+        .context("bench for prom-dump")?;
+    let thr = HealthThresholds::load_path("configs/ops/health_policy.yaml").unwrap_or_default();
+    let mut health = HealthManager::new(thr);
+    let _ = health.evaluate(&metrics.layered_snapshot(), None);
+    let text = render_prometheus_text(&metrics.layered_snapshot(), Some(health.state()), job);
+    if let Some(parent) = out.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(out, &text).with_context(|| format!("write {}", out.display()))?;
+    println!(
+        "prom-dump ok: packets={} health={} out={}",
+        report.packets,
+        health.state().as_str(),
+        out.display()
+    );
+    Ok(())
+}
+
+fn run_prom_serve(config_path: &PathBuf, once: bool) -> Result<()> {
+    use benchmark::{BenchProfile, PipelineBench};
+    use metrics_engine::{render_prometheus_text, HealthManager, HealthThresholds};
+    use serde::Deserialize;
+    use std::io::{Read, Write};
+    use std::net::TcpListener;
+
+    #[derive(Debug, Deserialize)]
+    struct PromScrapeConfig {
+        bind: String,
+        #[serde(default = "default_metrics_path")]
+        path: String,
+        #[serde(default = "default_true")]
+        refresh_on_scrape: bool,
+        #[serde(default = "default_bench")]
+        bench_profile: String,
+        #[serde(default = "default_symbols")]
+        symbol_count: u64,
+        #[serde(default = "default_job")]
+        job: String,
+    }
+    fn default_metrics_path() -> String {
+        "/metrics".into()
+    }
+    fn default_true() -> bool {
+        true
+    }
+    fn default_bench() -> String {
+        "configs/bench_profile.yaml".into()
+    }
+    fn default_symbols() -> u64 {
+        8
+    }
+    fn default_job() -> String {
+        "aether-sim".into()
+    }
+
+    let text = fs::read_to_string(config_path)
+        .with_context(|| format!("read {}", config_path.display()))?;
+    let cfg: PromScrapeConfig =
+        serde_yaml::from_str(&text).context("parse prometheus_scrape.yaml")?;
+
+    let render = || -> Result<String> {
+        let mut profile = BenchProfile::load_path(&cfg.bench_profile)
+            .with_context(|| format!("load {}", cfg.bench_profile))?;
+        profile.symbol_count = cfg.symbol_count;
+        let (_report, metrics) = PipelineBench::new(profile)
+            .with_base_dir(".")
+            .run()
+            .context("bench for prom-serve")?;
+        let thr = HealthThresholds::load_path("configs/ops/health_policy.yaml").unwrap_or_default();
+        let mut health = HealthManager::new(thr);
+        let _ = health.evaluate(&metrics.layered_snapshot(), None);
+        Ok(render_prometheus_text(
+            &metrics.layered_snapshot(),
+            Some(health.state()),
+            &cfg.job,
+        ))
+    };
+
+    let mut cached = render()?;
+    let listener = TcpListener::bind(&cfg.bind).with_context(|| format!("bind {}", cfg.bind))?;
+    println!(
+        "prom-serve listening on http://{}{} (once={})",
+        cfg.bind, cfg.path, once
+    );
+
+    for stream in listener.incoming() {
+        let mut stream = stream.context("accept")?;
+        let mut buf = [0u8; 1024];
+        let n = stream.read(&mut buf).unwrap_or(0);
+        let req = String::from_utf8_lossy(&buf[..n]);
+        let is_metrics = req.starts_with("GET ")
+            && (req.contains(&format!(" {} ", cfg.path))
+                || req.contains(&format!(" {}?", cfg.path))
+                || req.contains(&format!(" {} HTTP", cfg.path)));
+        if is_metrics {
+            if cfg.refresh_on_scrape {
+                cached = render()?;
+            }
+            let body = cached.as_bytes();
+            let header = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: text/plain; version=0.0.4\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
+            stream.write_all(header.as_bytes())?;
+            stream.write_all(body)?;
+            if once {
+                println!("prom-serve once: served /metrics then exit");
+                break;
+            }
+        } else {
+            let body = b"use GET /metrics\n";
+            let header = format!(
+                "HTTP/1.1 404 Not Found\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
+            let _ = stream.write_all(header.as_bytes());
+            let _ = stream.write_all(body);
+        }
+    }
+    Ok(())
+}
+
+fn run_fault_drill(profile_path: &PathBuf) -> Result<()> {
+    use benchmark::{FaultDrillProfile, FaultDrillRunner};
+
+    let profile = FaultDrillProfile::load_path(profile_path)
+        .with_context(|| format!("load {}", profile_path.display()))?;
+    let report = FaultDrillRunner::new(profile)
+        .with_base_dir(".")
+        .run()
+        .context("fault-drill")?;
+    println!("{}", serde_json::to_string_pretty(&report)?);
+    if !report.passed {
+        anyhow::bail!(
+            "fault-drill did not observe fault/recovery signals (packets={})",
+            report.bench.packets
+        );
+    }
+    println!(
+        "fault-drill ok: recovery_actions={} health={}",
+        report.recovery_actions, report.health
     );
     Ok(())
 }
@@ -281,6 +604,25 @@ fn run_bench(profile_path: &PathBuf) -> Result<()> {
     println!("report written: {}", out.display());
     println!("metrics: {}", metrics.to_json());
     Ok(())
+}
+
+fn run_accept(profile_path: &PathBuf) -> Result<()> {
+    use benchmark::{AcceptanceProfile, AcceptanceRunner};
+
+    let profile = AcceptanceProfile::load_path(profile_path)
+        .with_context(|| format!("load {}", profile_path.display()))?;
+    match AcceptanceRunner::new(profile).with_base_dir(".").run() {
+        Ok(report) => {
+            println!("{}", serde_json::to_string_pretty(&report)?);
+            println!("accept ok: profile={}", report.profile_id);
+            Ok(())
+        }
+        Err(benchmark::AcceptanceError::Failed(report)) => {
+            println!("{}", serde_json::to_string_pretty(&*report)?);
+            anyhow::bail!("acceptance failed: profile={}", report.profile_id);
+        }
+        Err(e) => Err(e.into()),
+    }
 }
 
 fn run_gpu_info() -> Result<()> {
@@ -533,7 +875,17 @@ fn run_host_recv(
             .with_context(|| format!("read {}", gpu_ring_path.display()))?,
     )?;
     let mut metrics = MetricsEngine::new();
-    let mut events = EventLogger::create("data/reports/host_recv_events.jsonl")?;
+    let ops = metrics_engine::ObservabilityConfig::load_path("configs/ops/observability.yaml").ok();
+    let events_path = ops
+        .as_ref()
+        .map(|o| o.logging.events_path.clone())
+        .unwrap_or_else(|| "data/reports/host_recv_events.jsonl".into());
+    let mut events = EventLogger::create(&events_path)?;
+    let _ = events.emit(
+        &LogEvent::now(metrics_engine::taxonomy::RUNTIME_STARTED)
+            .with_component("host-recv")
+            .with_detail(transport.to_string()),
+    );
 
     #[cfg(feature = "cuda")]
     let mut cuda_gpu = if use_cuda {
@@ -635,7 +987,8 @@ fn run_host_recv(
                     }
                     let e2e = now.saturating_sub(delivered.timestamp.0);
                     let _ = events.emit(
-                        &LogEvent::now("packet_rx")
+                        &LogEvent::now(metrics_engine::taxonomy::PACKET_RX)
+                            .with_component("host-recv")
                             .with_stream(delivered.stream_id.0)
                             .with_sequence(delivered.sequence.0)
                             .with_latency_us(e2e as f64 / 1_000.0),

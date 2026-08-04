@@ -1,10 +1,11 @@
 # benchmark
 
-Latency percentiles, throughput (Gbps / GB/s / pps), and `PipelineBench` E2E harness.
+Latency percentiles, throughput (Gbps / GB/s / pps), `PipelineBench`, and `AcceptanceRunner` SLA gates.
 
-Config: `configs/bench_profile.yaml`. Report output: `data/reports/bench_last.json`.
+Configs: `configs/bench_profile*.yaml`, `configs/acceptance_profile*.yaml`.
 
 ```bash
 cargo test -p benchmark
 cargo run -p aether-radio-cli -- bench
+cargo run -p aether-radio-cli -- accept
 ```

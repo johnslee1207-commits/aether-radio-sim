@@ -1,13 +1,17 @@
 version: "1.0.0"
-id: dpdk-backend-stub
+id: dpdk-backend-mock
 classification: external_integration_specific
 description: >
-  Placeholder contract for a future DpdkPacketIO adapter.
-  Business crates must not link libdpdk; try_open currently returns BackendUnavailable.
-enabled: false
+  DPDK PacketIO contract. Business crates never link libdpdk.
+  backend=mock simulates mbuf/burst queues; backend=hardware remains unavailable
+  until a dedicated adapter crate is enabled.
+backend: mock
+enabled: true
 pci_address: "0000:00:00.0"
 rx_queues: 1
 tx_queues: 1
-mbuf_pool_size: 8192
+mbuf_pool_size: 1024
+burst_size: 32
+poll_cost_ns: 50
 hugepage_mb: 0
-notes: Use SimPacketIO, NetPacketIO, or ShmPacketIO until a dedicated DPDK crate exists.
+notes: Prefer SimPacketIO for unit tests; use mock for DPDK-shaped integration.

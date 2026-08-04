@@ -1,0 +1,13 @@
+version: "1.0.0"
+id: fault-injection-stress
+classification: project_specific
+description: Stress faults for soak / fault drills (not default MVP profile)
+enabled: true
+loss_rate: 0.0
+extra_latency_us: 2.0
+burst_length: 3
+burst_start: 20
+kernel_delay_us: 50.0
+reorder_distance: 0
+sequence_jump: 0
+timestamp_skew_ns: 500

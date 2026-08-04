@@ -6,3 +6,7 @@ loss_rate: 0.001
 extra_latency_us: 5.0
 burst_length: 10
 kernel_delay_us: 100.0
+burst_start: 0
+reorder_distance: 0
+sequence_jump: 0
+timestamp_skew_ns: 0

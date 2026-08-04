@@ -8,3 +8,4 @@ description = "Unified host/GPU memory backend abstraction"
 [dependencies]
 thiserror = { workspace = true }
 serde = { workspace = true }
+serde_yaml = { workspace = true }

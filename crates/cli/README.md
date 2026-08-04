@@ -7,6 +7,7 @@ cargo run -p aether-radio-cli -- info
 cargo run -p aether-radio-cli -- validate-config
 cargo run -p aether-radio-cli -- smoke
 cargo run -p aether-radio-cli -- bench
+cargo run -p aether-radio-cli -- accept
 cargo run -p aether-radio-cli -- bench --profile configs/bench_profile_multistream.yaml
 
 # Dual-process UDP / shared-memory

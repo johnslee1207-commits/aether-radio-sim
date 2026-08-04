@@ -1,0 +1,17 @@
+version: "1.0.0"
+id: recovery-policy-default
+classification: project_specific
+description: Automatic recovery actions keyed by fault class
+actions:
+  packet_invalid:
+    action: mark_invalid_continue
+  sequence_gap:
+    action: recover_sequence
+  buffer_overflow:
+    action: drop_oldest_resync_slot
+  link_down:
+    action: restart_stream
+  gpu_stall:
+    action: alert_and_continue
+  late_packet:
+    action: record_and_drop

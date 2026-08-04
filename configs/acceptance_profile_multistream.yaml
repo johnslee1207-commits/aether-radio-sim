@@ -1,0 +1,13 @@
+version: "1.0.0"
+id: acceptance-multistream
+classification: project_specific
+description: Multi-stream acceptance gates (relaxed late/symbol vs single-stream)
+bench_profile: configs/bench_profile_multistream.yaml
+ethernet_config: configs/ethernet_model.yaml
+min_model_bandwidth_gbps: 100.0
+max_p99_latency_ns: 80000
+max_sequence_gaps: 0
+max_late_packets: 128
+max_symbol_miss: 128
+min_packets: 64
+report_path: data/reports/acceptance_multistream.json

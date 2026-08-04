@@ -9,3 +9,4 @@ description = "Packet loss, delay, burst loss, and GPU slowdown injection"
 serde = { workspace = true }
 serde_yaml = { workspace = true }
 thiserror = { workspace = true }
+aether-types = { workspace = true }

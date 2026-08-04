@@ -2,19 +2,23 @@
 
 This repository implements **Aether Radio Data Plane Simulation Platform v1.1**.
 
-Canonical spec: `docs/CURSOR_DEVELOPMENT_SPEC_v1.1.md`.
+Canonical spec: `docs/CURSOR_DEVELOPMENT_SPEC_v1.1.md`.  
+Observability & Ops (first-class): `docs/AETHER_RADIO_OBSERVABILITY_OPS_FRAMEWORK_v1.0.md`.  
+Coverage: `data/architecture/observability_coverage_matrix.json`.
 
 ## Stack
 
 - Core runtime: Rust
 - Control plane / scheduling: tokio
 - Data plane: lock-free / poll / zero-copy oriented (no async on hot path)
+- Observability plane: Metrics / Log-Event / Trace / Health (see Ops Framework; Trace = Sprint O)
 
 ## Cursor Agent rules
 
 1. **Interface → test → mock → backend.** Never bind DPDK, CUDA, or Linux sockets in business crates.
-2. **Small tasks only** (`T001` …). Do not generate an entire module tree in one shot.
+2. **Small tasks only** (`T001` … / observability `O001` …). Do not generate an entire module tree in one shot.
 3. Each crate must keep `README.md`, unit tests, and (when applicable) bench hooks.
+4. **Observability is first-class.** Every datapath change includes Metrics hook → Log/Event hook → Trace hook (when TraceEngine exists) before considering the task done. Policies live under `configs/ops/`.
 
 ## Sprint map
 
@@ -26,6 +30,7 @@ Canonical spec: `docs/CURSOR_DEVELOPMENT_SPEC_v1.1.md`.
 | 4 | Transport stream/sequence/timestamp — **Done** |
 | 5 | Host/GPU memory (+ ring BufferState) — **Done** |
 | 6 | Benchmark + metrics harness — **Done** |
+| O | Observability & Operations Plane — **O001–O015 Done** |
 
 <!-- program-data-decoupling:start -->
 # Program/Data Decoupling
@@ -34,7 +39,7 @@ Before architecture design, workflow design, coding, or refactoring this
 project, MUST read and apply program/data decoupling:
 
 - Keep executable code focused on behavior (loaders, validators, executors, adapters, algorithms).
-- Put bandwidth, latency, loss, DMA delay, fault rates, stream counts, and backend selection in `configs/` or `data/profiles/`.
+- Put bandwidth, latency, loss, DMA delay, fault rates, stream counts, backend selection, health thresholds, and observability export paths in `configs/`, `configs/ops/`, or `data/profiles/`.
 - Update `data/architecture/data_classification_registry.json` when adding persistent data paths.
 - Do not hardcode local absolute paths or secrets in source.
 
@@ -48,6 +53,12 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 cargo run -p aether-radio-cli -- smoke
 cargo run -p aether-radio-cli -- bench
+cargo run -p aether-radio-cli -- accept
+cargo run -p aether-radio-cli -- ops-status
+cargo run -p aether-radio-cli -- prom-dump
+cargo run -p aether-radio-cli -- soak --profile configs/soak_profile_ci.yaml
+cargo run -p aether-radio-cli -- fault-drill
+cargo run -p aether-radio-cli -- prom-serve --once
 # WSL2 + RTX GPU (optional):
 # export LD_LIBRARY_PATH=/usr/lib/wsl/lib:$LD_LIBRARY_PATH
 # cargo run -p aether-radio-cli --features cuda -- gpu-info
@@ -60,7 +71,7 @@ cargo run -p aether-radio-cli -- bench
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **aether-radio-sim** (959 symbols, 1622 relationships, 11 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **aether-radio-sim** (970 symbols, 1632 relationships, 11 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > If any GitNexus tool warns the index is stale, run `npx gitnexus analyze` in terminal first.
 

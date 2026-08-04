@@ -176,6 +176,41 @@ impl IQSource for MockIQSource {
     }
 }
 
+/// Multi-carrier IQ: sums tone offsets per carrier index (still simulation).
+#[derive(Debug)]
+pub struct MultiCarrierIQSource {
+    pub samples_per_symbol: usize,
+    pub carriers: u16,
+    pub amplitude: f32,
+}
+
+impl MultiCarrierIQSource {
+    pub fn new(samples_per_symbol: usize, carriers: u16) -> Self {
+        Self {
+            samples_per_symbol,
+            carriers: carriers.max(1),
+            amplitude: 1.0 / (carriers.max(1) as f32),
+        }
+    }
+}
+
+impl IQSource for MultiCarrierIQSource {
+    fn generate(&mut self, timestamp: RadioTimestamp) -> Vec<IQSample> {
+        (0..self.samples_per_symbol)
+            .map(|i| {
+                let mut re = 0.0f32;
+                let mut im = 0.0f32;
+                for c in 0..self.carriers {
+                    let phase = (timestamp.ns as f32) * 1e-9 + i as f32 * 0.01 + (c as f32) * 0.17;
+                    re += self.amplitude * phase.cos();
+                    im += self.amplitude * phase.sin();
+                }
+                IQSample::new(re, im)
+            })
+            .collect()
+    }
+}
+
 /// Packs IQ as interleaved f32 LE bytes; uses an external sequence when provided.
 #[derive(Debug, Default)]
 pub struct SimplePacketizer {
@@ -290,5 +325,14 @@ max_carriers: 4
         assert_eq!(a.sequence.0, 0);
         assert_eq!(b.sequence.0, 1);
         assert!(b.timestamp.0 > a.timestamp.0);
+    }
+
+    #[test]
+    fn multi_carrier_iq_has_unitish_power() {
+        let mut iq = MultiCarrierIQSource::new(32, 4);
+        let samples = iq.generate(RadioTimestamp::new(0, 0, 0, 0));
+        assert_eq!(samples.len(), 32);
+        let power: f32 = samples.iter().map(|s| s.i * s.i + s.q * s.q).sum::<f32>() / 32.0;
+        assert!(power > 0.05 && power < 2.0, "power={power}");
     }
 }

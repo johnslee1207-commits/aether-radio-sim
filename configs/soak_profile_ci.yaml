@@ -1,0 +1,13 @@
+version: "1.0.0"
+id: soak-ci
+classification: project_specific
+description: Short soak for CI (fault injection disabled)
+bench_profile: configs/bench_profile.yaml
+fault_config: configs/fault_injection.yaml
+symbol_count_override: 64
+streams_override: 1
+report_path: data/reports/soak_ci.json
+events_path: data/reports/soak_ci_events.jsonl
+max_sequence_gaps: 0
+max_deadline_miss_ratio: 1.0
+min_packets: 32

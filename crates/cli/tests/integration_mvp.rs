@@ -203,3 +203,29 @@ fn test5_cx5_dma_and_gpu_ring() {
     assert_eq!(latency, ring.kernel_delay_ns());
     assert_eq!(ring.count_state(BufferState::Free), ring.slot_count());
 }
+
+/// Integration Test 6: DPDK mock PacketIO + pooled H2D memory
+#[test]
+fn test6_dpdk_mock_and_pooled_memory() {
+    use cx5_emulator::{DpdkPacketIO, PacketIO};
+    use memory_manager::{MemoryBackend, MemoryKind, PooledMemory};
+
+    let mut dpdk = DpdkPacketIO::open_yaml(include_str!("../../../configs/backends/dpdk.yaml"))
+        .expect("mock dpdk");
+    let pkt = Packet::new(StreamId(1), Sequence(0), Timestamp(0), vec![3; 64]);
+    dpdk.inject_rx([pkt]).unwrap();
+    let burst = dpdk.rx_burst(32);
+    assert_eq!(burst.len(), 1);
+    assert_eq!(dpdk.tx_burst(burst.clone()), 1);
+
+    let mut mem =
+        PooledMemory::from_yaml(include_str!("../../../configs/memory_pool.yaml")).unwrap();
+    let host = mem
+        .allocate(burst[0].payload.len(), MemoryKind::Host)
+        .unwrap();
+    mem.write(host, 0, &burst[0].payload).unwrap();
+    let (_gpu, ns) = mem
+        .copy(host, 0, burst[0].payload.len(), MemoryKind::Gpu)
+        .unwrap();
+    assert!(ns >= 200);
+}

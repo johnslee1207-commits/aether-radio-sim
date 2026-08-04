@@ -1,0 +1,13 @@
+version: "1.0.0"
+id: acceptance-mvp
+classification: project_specific
+description: Gate PipelineBench + ethernet model against SLA-style thresholds
+bench_profile: configs/bench_profile.yaml
+ethernet_config: configs/ethernet_model.yaml
+min_model_bandwidth_gbps: 100.0
+max_p99_latency_ns: 50000
+max_sequence_gaps: 0
+max_late_packets: 200
+max_symbol_miss: 200
+min_packets: 64
+report_path: data/reports/acceptance_last.json

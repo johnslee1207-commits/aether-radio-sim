@@ -1,0 +1,20 @@
+version: "1.0.0"
+id: health-policy-default
+classification: project_specific
+description: Runtime health thresholds (simulation); values are gates not hardcodes in engines
+states:
+  - NORMAL
+  - WARNING
+  - DEGRADED
+  - FAILED
+  - RECOVERY
+thresholds:
+  max_loss_rate: 0.001
+  max_seq_gap_per_window: 0
+  max_latency_p99_ns: 50000
+  max_jitter_ns: 5000
+  max_symbol_deadline_miss_per_window: 8
+  max_gpu_stall_ns: 100000
+  window_ms: 1000
+recovery:
+  policy_path: configs/ops/recovery_policy.yaml

@@ -23,7 +23,8 @@
       "path_globs": [
         "data/profiles/**",
         "configs/*.yaml",
-        "configs/*.yml"
+        "configs/*.yml",
+        "configs/ops/**"
       ]
     },
     "external_integration_specific": {
@@ -36,14 +37,17 @@
         "docker-compose.cuda.yml",
         "Dockerfile.fpga",
         "Dockerfile.host",
-        "Dockerfile.cuda"
+        "Dockerfile.cuda",
+        "data/ops/dashboards/**"
       ]
     },
     "runtime_generated": {
-      "description": "Benchmarks, metrics dumps, logs, and CI artifacts.",
+      "description": "Benchmarks, metrics dumps, logs, traces, and CI artifacts.",
       "path_globs": [
         "data/reports/**",
-        "target/**"
+        "data/reports/traces/**",
+        "target/**",
+        ".gitnexus/**"
       ]
     },
     "local_machine_specific": {

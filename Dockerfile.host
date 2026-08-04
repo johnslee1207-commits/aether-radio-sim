@@ -1,6 +1,15 @@
 # Host dataplane container: transport + CX5 model + GPU ring (simulation by default).
-FROM rust:1.85-bookworm
+# Uses ubuntu:22.04 (commonly cached) + rustup to avoid rust: DockerHub mirror 401s.
+FROM ubuntu:22.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ca-certificates curl build-essential pkg-config libssl-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain 1.85.0 \
+    && /root/.cargo/bin/rustup component add rustfmt clippy
+
+ENV PATH=/root/.cargo/bin:$PATH
 WORKDIR /workspace
 COPY . /workspace
 

@@ -118,4 +118,12 @@ Unit：`cargo test` per crate。Integration：单 stream、100G 模型、多 str
 
 Sprint 1–6 见 `AGENTS.md`。MVP：FPGA 出数、transport、memory、GPU 模拟、metrics。硬件替换不改 protocol/transport/metrics/benchmark。
 
+**Observability & Operations（一等公民）** 独立规范：
+
+* `docs/AETHER_RADIO_OBSERVABILITY_OPS_FRAMEWORK_v1.0.md`
+* 覆盖矩阵：`data/architecture/observability_coverage_matrix.json`
+* 策略配置：`configs/ops/`
+
+开发顺序强制：Feature Core → Metrics Hook → Log/Event Hook → Trace Hook → Bench/Accept。
+
 最终形成 Aether Radio Data Plane Runtime，支撑 AI-RAN / 6G distributed PHY / GPU baseband 验证。

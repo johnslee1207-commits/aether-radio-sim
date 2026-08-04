@@ -26,3 +26,26 @@ jobs:
         run: cargo run -p aether-radio-cli -- smoke --profile configs/simulation_profile.yaml
       - name: Bench CLI
         run: cargo run -p aether-radio-cli -- bench --profile configs/bench_profile.yaml
+      - name: Accept gates
+        run: cargo run -p aether-radio-cli -- accept --profile configs/acceptance_profile.yaml
+      - name: Accept multistream
+        run: cargo run -p aether-radio-cli -- accept --profile configs/acceptance_profile_multistream.yaml
+      - name: Prom dump
+        run: cargo run -p aether-radio-cli -- prom-dump --out data/reports/metrics.prom
+      - name: Soak CI
+        run: cargo run -p aether-radio-cli -- soak --profile configs/soak_profile_ci.yaml
+      - name: Fault drill
+        run: cargo run -p aether-radio-cli -- fault-drill
+      - name: Prom serve once
+        run: |
+          cargo run -p aether-radio-cli -- prom-serve --once &
+          PID=$!
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:9898/metrics >/dev/null; then
+              wait $PID
+              exit 0
+            fi
+            sleep 0.5
+          done
+          kill $PID || true
+          exit 1

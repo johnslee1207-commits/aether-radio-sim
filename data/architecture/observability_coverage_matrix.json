@@ -1,0 +1,40 @@
+{
+  "version": "1.3.0",
+  "id": "aether-radio-observability-coverage",
+  "classification": "platform_common",
+  "framework": "docs/AETHER_RADIO_OBSERVABILITY_OPS_FRAMEWORK_v1.0.md",
+  "assessed_at": "2026-08-04",
+  "sprint_o": {
+    "completed": [
+      "O001", "O002", "O003", "O004", "O005", "O006", "O007", "O008", "O009", "O010",
+      "O011", "O012", "O013", "O014", "O015"
+    ],
+    "remaining": []
+  },
+  "legend": {
+    "0": "absent",
+    "1": "stub/schema only",
+    "2": "partial implementation",
+    "3": "usable in sim paths",
+    "4": "first-class with tests/gates",
+    "5": "production-ops ready"
+  },
+  "pillars": [
+    { "id": "metrics", "score": 4, "notes": "5-layer + Prometheus text + HTTP scrape (prom-serve)" },
+    { "id": "logging_events", "score": 4, "notes": "taxonomy + JSONL on smoke/bench/host-recv/soak/drill" },
+    { "id": "trace", "score": 4, "notes": "TraceEngine default-on in ops yaml; PipelineBench stamps stages" },
+    { "id": "health", "score": 4, "notes": "HealthManager on smoke/prom/soak/fault-drill" },
+    { "id": "recovery", "score": 4, "notes": "RecoveryPolicy executor + fault-drill" },
+    { "id": "config_management", "score": 4, "notes": "configs/ops + soak/fault/prom scrape profiles" },
+    { "id": "test_framework", "score": 4, "notes": "L4 soak CI + fault-drill + prom-serve --once" },
+    { "id": "fault_injection", "score": 4, "notes": "FaultInjector + recovery wiring + drill profile" },
+    { "id": "benchmark", "score": 4, "notes": "PipelineBench + accept + soak + memory metrics" },
+    { "id": "dashboard", "score": 3, "notes": "Grafana overview JSON sample (importable)" }
+  ],
+  "overall_ops_score_0_to_5": 4.3,
+  "next_tasks": [
+    "Optional: continuous HealthManager poll during multi-minute soak wall-clock",
+    "Optional: real DPDK/DOCA hardware adapter",
+    "Optional: Grafana live datasource against prom-serve"
+  ]
+}

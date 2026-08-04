@@ -164,30 +164,157 @@ pub enum Cx5Error {
     QueueFull,
     #[error("backend unavailable: {0}")]
     BackendUnavailable(String),
+    #[error("mbuf pool exhausted")]
+    MbufExhausted,
 }
 
-/// Placeholder for a future DPDK `PacketIO` backend.
+/// DPDK-shaped `PacketIO` loaded from `configs/backends/dpdk.yaml`.
 ///
-/// This type intentionally does **not** link libdpdk. Business crates keep using
-/// `PacketIO`; enable a real DPDK adapter in a dedicated crate/feature later.
-#[derive(Debug, Default)]
-pub struct DpdkPacketIO;
+/// - `backend: mock` — in-process mbuf/burst simulation (no libdpdk)
+/// - `backend: hardware` — returns [`Cx5Error::BackendUnavailable`] until a
+///   dedicated adapter crate is compiled in
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DpdkBackendConfig {
+    pub version: String,
+    pub id: String,
+    #[serde(default = "default_dpdk_backend")]
+    pub backend: String,
+    #[serde(default)]
+    pub enabled: bool,
+    #[serde(default)]
+    pub pci_address: String,
+    #[serde(default = "default_one")]
+    pub rx_queues: usize,
+    #[serde(default = "default_one")]
+    pub tx_queues: usize,
+    #[serde(default = "default_mbuf_pool")]
+    pub mbuf_pool_size: usize,
+    #[serde(default = "default_burst")]
+    pub burst_size: usize,
+    #[serde(default)]
+    pub poll_cost_ns: u64,
+    #[serde(default)]
+    pub hugepage_mb: u64,
+}
+
+fn default_dpdk_backend() -> String {
+    "mock".into()
+}
+fn default_one() -> usize {
+    1
+}
+fn default_mbuf_pool() -> usize {
+    1024
+}
+fn default_burst() -> usize {
+    32
+}
+
+impl DpdkBackendConfig {
+    pub fn from_yaml_str(s: &str) -> Result<Self, Cx5Error> {
+        serde_yaml::from_str(s).map_err(|e| Cx5Error::Config(e.to_string()))
+    }
+}
+
+/// Mock / unavailable DPDK PacketIO (never links libdpdk).
+#[derive(Debug)]
+pub struct DpdkPacketIO {
+    cfg: DpdkBackendConfig,
+    rx: Vec<Packet>,
+    tx: Vec<Packet>,
+    mbufs_in_use: usize,
+    pub poll_cycles: u64,
+    pub last_poll_cost_ns: u64,
+}
 
 impl DpdkPacketIO {
-    pub fn try_open(_config_path: &str) -> Result<Self, Cx5Error> {
-        Err(Cx5Error::BackendUnavailable(
-            "DPDK PacketIO is not compiled in; use SimPacketIO, NetPacketIO, or ShmPacketIO".into(),
-        ))
+    pub fn open_yaml(yaml: &str) -> Result<Self, Cx5Error> {
+        let cfg = DpdkBackendConfig::from_yaml_str(yaml)?;
+        Self::open_config(cfg)
+    }
+
+    pub fn open_config(cfg: DpdkBackendConfig) -> Result<Self, Cx5Error> {
+        let mode = cfg.backend.to_ascii_lowercase();
+        if matches!(mode.as_str(), "hardware" | "libdpdk" | "real") || !cfg.enabled {
+            return Err(Cx5Error::BackendUnavailable(format!(
+                "DPDK backend={mode} enabled={} is not available in this build; use backend=mock",
+                cfg.enabled
+            )));
+        }
+        if !matches!(mode.as_str(), "mock" | "simulation" | "sim") {
+            return Err(Cx5Error::Config(format!("unknown DPDK backend '{mode}'")));
+        }
+        Ok(Self {
+            cfg,
+            rx: Vec::new(),
+            tx: Vec::new(),
+            mbufs_in_use: 0,
+            poll_cycles: 0,
+            last_poll_cost_ns: 0,
+        })
+    }
+
+    /// Path-based open used by adapters; reads YAML from disk.
+    pub fn try_open(config_path: &str) -> Result<Self, Cx5Error> {
+        let yaml = std::fs::read_to_string(config_path)
+            .map_err(|e| Cx5Error::Config(format!("read {config_path}: {e}")))?;
+        Self::open_yaml(&yaml)
+    }
+
+    pub fn inject_rx(&mut self, packets: impl IntoIterator<Item = Packet>) -> Result<(), Cx5Error> {
+        for p in packets {
+            if self.mbufs_in_use >= self.cfg.mbuf_pool_size {
+                return Err(Cx5Error::MbufExhausted);
+            }
+            self.rx.push(p);
+            self.mbufs_in_use += 1;
+        }
+        Ok(())
+    }
+
+    pub fn mbufs_in_use(&self) -> usize {
+        self.mbufs_in_use
+    }
+
+    pub fn mbuf_pool_size(&self) -> usize {
+        self.cfg.mbuf_pool_size
+    }
+
+    pub fn burst_size(&self) -> usize {
+        self.cfg.burst_size
+    }
+
+    pub fn config(&self) -> &DpdkBackendConfig {
+        &self.cfg
     }
 }
 
 impl PacketIO for DpdkPacketIO {
-    fn rx_burst(&mut self, _max: usize) -> Vec<Packet> {
-        Vec::new()
+    fn rx_burst(&mut self, max: usize) -> Vec<Packet> {
+        self.poll_cycles += 1;
+        self.last_poll_cost_ns = self.cfg.poll_cost_ns;
+        let n = max.min(self.cfg.burst_size).min(self.rx.len());
+        let out: Vec<_> = self.rx.drain(0..n).collect();
+        self.mbufs_in_use = self.mbufs_in_use.saturating_sub(out.len());
+        out
     }
 
-    fn tx_burst(&mut self, _packets: Vec<Packet>) -> usize {
-        0
+    fn tx_burst(&mut self, packets: Vec<Packet>) -> usize {
+        self.poll_cycles += 1;
+        self.last_poll_cost_ns = self.cfg.poll_cost_ns;
+        let room = self
+            .cfg
+            .mbuf_pool_size
+            .saturating_sub(self.mbufs_in_use)
+            .min(self.cfg.burst_size)
+            .min(packets.len());
+        let taken: Vec<_> = packets.into_iter().take(room).collect();
+        let n = taken.len();
+        self.mbufs_in_use += n;
+        self.tx.extend(taken);
+        // TX completion returns mbufs to the pool in this mock.
+        self.mbufs_in_use = self.mbufs_in_use.saturating_sub(n);
+        n
     }
 }
 
@@ -203,6 +330,18 @@ nic_dma_latency_us: 2.0
 rx_queue_depth: 8
 tx_queue_depth: 8
 completion_queue_depth: 8
+"#;
+
+    const DPDK_MOCK: &str = r#"
+version: "1.0.0"
+id: dpdk-mock
+backend: mock
+enabled: true
+rx_queues: 1
+tx_queues: 1
+mbuf_pool_size: 4
+burst_size: 2
+poll_cost_ns: 10
 "#;
 
     #[test]
@@ -232,10 +371,41 @@ completion_queue_depth: 8
     }
 
     #[test]
-    fn dpdk_stub_is_unavailable() {
+    fn dpdk_hardware_is_unavailable() {
+        let yaml = r#"
+version: "1.0.0"
+id: dpdk-hw
+backend: hardware
+enabled: true
+"#;
         assert!(matches!(
-            DpdkPacketIO::try_open("configs/backends/dpdk.yaml"),
+            DpdkPacketIO::open_yaml(yaml),
             Err(Cx5Error::BackendUnavailable(_))
         ));
+    }
+
+    #[test]
+    fn dpdk_mock_burst_and_mbuf_limit() {
+        let mut io = DpdkPacketIO::open_yaml(DPDK_MOCK).unwrap();
+        assert_eq!(io.burst_size(), 2);
+        for i in 0..4 {
+            io.inject_rx([Packet::new(
+                StreamId(1),
+                Sequence(i),
+                Timestamp(0),
+                vec![i as u8],
+            )])
+            .unwrap();
+        }
+        assert!(matches!(
+            io.inject_rx([Packet::new(StreamId(1), Sequence(9), Timestamp(0), vec![9])]),
+            Err(Cx5Error::MbufExhausted)
+        ));
+        let first = io.rx_burst(8);
+        assert_eq!(first.len(), 2);
+        assert_eq!(io.last_poll_cost_ns, 10);
+        let second = io.rx_burst(8);
+        assert_eq!(second.len(), 2);
+        assert_eq!(io.tx_burst(first), 2);
     }
 }
