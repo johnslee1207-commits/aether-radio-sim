@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: net-link-host
+classification: external_integration_specific
+description: Host dataplane container RX from fpga-sim
+bind_addr: "0.0.0.0:9000"
+peer_addr: ""
+recv_timeout_ms: 200
+max_datagram_bytes: 65535

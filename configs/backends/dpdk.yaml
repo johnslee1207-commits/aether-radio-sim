@@ -1,0 +1,13 @@
+version: "1.0.0"
+id: dpdk-backend-stub
+classification: external_integration_specific
+description: >
+  Placeholder contract for a future DpdkPacketIO adapter.
+  Business crates must not link libdpdk; try_open currently returns BackendUnavailable.
+enabled: false
+pci_address: "0000:00:00.0"
+rx_queues: 1
+tx_queues: 1
+mbuf_pool_size: 8192
+hugepage_mb: 0
+notes: Use SimPacketIO, NetPacketIO, or ShmPacketIO until a dedicated DPDK crate exists.

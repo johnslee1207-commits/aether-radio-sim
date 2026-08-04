@@ -1,0 +1,25 @@
+[package]
+name = "benchmark"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Throughput and latency benchmark helpers"
+
+[features]
+default = []
+cuda = ["gpu-cuda/cuda"]
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = { workspace = true }
+aether-types = { workspace = true }
+aether-transport = { workspace = true }
+fpga-emulator = { workspace = true }
+ethernet-model = { workspace = true }
+cx5-emulator = { workspace = true }
+gpu-runtime = { workspace = true }
+gpu-cuda = { workspace = true }
+metrics-engine = { workspace = true }
+fault-injection = { workspace = true }

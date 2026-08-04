@@ -1,0 +1,7 @@
+version: "1.0.0"
+id: cx5-dma-model
+classification: project_specific
+nic_dma_latency_us: 2.0
+rx_queue_depth: 1024
+tx_queue_depth: 1024
+completion_queue_depth: 1024

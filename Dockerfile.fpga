@@ -1,0 +1,9 @@
+# Lightweight image for FPGA emulator container (no CUDA/DPDK).
+FROM rust:1.85-bookworm
+
+WORKDIR /workspace
+COPY . /workspace
+
+RUN cargo build -p aether-radio-cli --release
+
+CMD ["cargo", "run", "-p", "aether-radio-cli", "--release", "--", "fpga-emit", "--help"]

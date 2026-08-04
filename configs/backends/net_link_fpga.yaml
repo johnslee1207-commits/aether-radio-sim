@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: net-link-fpga
+classification: external_integration_specific
+description: FPGA container TX toward host-dataplane
+bind_addr: "0.0.0.0:0"
+peer_addr: "host-dataplane:9000"
+recv_timeout_ms: 50
+max_datagram_bytes: 65535

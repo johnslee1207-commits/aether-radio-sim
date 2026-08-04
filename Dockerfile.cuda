@@ -1,0 +1,20 @@
+# syntax=docker/dockerfile:1
+# CUDA devel image for Aether Radio Sim on WSL2 + RTX 40-series.
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl ca-certificates build-essential pkg-config git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rust
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH=/root/.cargo/bin:$PATH
+
+WORKDIR /workspace
+COPY . /workspace
+
+# Default: build CLI with CUDA feature
+RUN cargo build -p aether-radio-cli --features cuda --release
+
+CMD ["cargo", "run", "-p", "aether-radio-cli", "--features", "cuda", "--", "gpu-info"]

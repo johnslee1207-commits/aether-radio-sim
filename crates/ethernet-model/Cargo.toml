@@ -1,0 +1,11 @@
+[package]
+name = "ethernet-model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Ethernet link model: bandwidth, latency, jitter, loss"
+
+[dependencies]
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = { workspace = true }

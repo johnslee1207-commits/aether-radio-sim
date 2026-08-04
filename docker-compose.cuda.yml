@@ -1,0 +1,25 @@
+# WSL2 + Docker Desktop: use NVIDIA Container Toolkit / WSL GPU.
+services:
+  aether-cuda:
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    gpus: all
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - cargo-registry:/root/.cargo/registry
+      - cargo-git:/root/.cargo/git
+      - target-cuda:/workspace/target
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    command: >
+      bash -lc "cargo run -p aether-radio-cli --features cuda -- gpu-info
+      && cargo run -p aether-radio-cli --features cuda -- smoke-cuda
+      && cargo test -p gpu-cuda --features cuda -- --nocapture"
+
+volumes:
+  cargo-registry:
+  cargo-git:
+  target-cuda:

@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: shm-link-default
+classification: external_integration_specific
+description: Same-host shared-memory ring for µs functional path
+path: data/reports/shm_link.bin
+slot_count: 64
+slot_bytes: 8192
+create: false

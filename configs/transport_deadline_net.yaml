@@ -1,0 +1,7 @@
+version: "1.0.0"
+id: transport-deadline-net
+classification: project_specific
+description: Relaxed late-packet policy for cross-container UDP functional path (not µs acceptance)
+max_latency_ns: 5000000000
+allow_reorder: false
+start_sequence: 0

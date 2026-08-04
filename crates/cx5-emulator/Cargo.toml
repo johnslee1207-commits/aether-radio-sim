@@ -1,0 +1,12 @@
+[package]
+name = "cx5-emulator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "ConnectX-5 NIC queue and DMA latency emulator"
+
+[dependencies]
+aether-types = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = { workspace = true }

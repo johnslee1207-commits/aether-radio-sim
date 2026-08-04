@@ -1,0 +1,13 @@
+[package]
+name = "aether-transport"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Aether Radio transport runtime: streams, scheduling, sequence checks"
+
+[dependencies]
+aether-types = { workspace = true }
+aether-protocol = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }

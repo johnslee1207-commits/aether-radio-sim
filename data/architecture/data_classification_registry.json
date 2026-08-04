@@ -1,0 +1,65 @@
+{
+  "version": "1.0.0",
+  "id": "aether-radio-sim-data-classification",
+  "classification": "platform_common",
+  "purpose": "Classify config, profile, and generated artifact ownership for program/data decoupling.",
+  "layers": {
+    "platform_common": {
+      "description": "Reusable simulation contracts, backend trait boundaries, and default policies.",
+      "path_globs": [
+        "data/architecture/**",
+        "docs/**"
+      ]
+    },
+    "domain_common": {
+      "description": "Radio transport / eCPRI-like domain defaults and model parameters.",
+      "path_globs": [
+        "configs/domain/**",
+        "configs/radio_timing.yaml"
+      ]
+    },
+    "project_specific": {
+      "description": "Project identity and selected simulation profiles.",
+      "path_globs": [
+        "data/profiles/**",
+        "configs/*.yaml",
+        "configs/*.yml"
+      ]
+    },
+    "external_integration_specific": {
+      "description": "Future DPDK/CUDA/DOCA backend integration contracts.",
+      "path_globs": [
+        "configs/backends/**",
+        "configs/transport_deadline_net.yaml",
+        "docker-compose.split.yml",
+        "docker-compose.shm.yml",
+        "docker-compose.cuda.yml",
+        "Dockerfile.fpga",
+        "Dockerfile.host",
+        "Dockerfile.cuda"
+      ]
+    },
+    "runtime_generated": {
+      "description": "Benchmarks, metrics dumps, logs, and CI artifacts.",
+      "path_globs": [
+        "data/reports/**",
+        "target/**"
+      ]
+    },
+    "local_machine_specific": {
+      "description": "Local tool paths and machine overrides; never commit secrets.",
+      "path_globs": [
+        "configs/local/**",
+        ".env"
+      ]
+    },
+    "legacy_or_sample": {
+      "description": "Fixtures and sample configs for tests.",
+      "path_globs": [
+        "tests/fixtures/**",
+        "configs/samples/**"
+      ]
+    }
+  },
+  "review_gate": "any new persistent data path must map to a layer before merge"
+}

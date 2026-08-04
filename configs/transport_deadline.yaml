@@ -1,0 +1,7 @@
+version: "1.0.0"
+id: transport-deadline-policy
+classification: project_specific
+description: Late-packet and sequence check policy for transport runtime
+max_latency_ns: 10000
+allow_reorder: false
+start_sequence: 0

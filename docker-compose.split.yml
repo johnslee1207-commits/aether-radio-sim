@@ -1,0 +1,93 @@
+# Dual-container topology:
+#   fpga-sim  --UDP Aether frames-->  host-dataplane (CX5/GPU path)
+#
+# Usage (WSL / Docker Desktop with compose v2):
+#   docker compose -f docker-compose.split.yml up --build
+#
+# GPU on host-dataplane is optional; default uses SimGpu/ring (no --gpus required).
+# To enable CUDA on host:
+#   docker compose -f docker-compose.split.yml --profile cuda up --build
+
+services:
+  host-dataplane:
+    build:
+      context: .
+      dockerfile: Dockerfile.host
+    container_name: aether-host-dataplane
+    networks:
+      - aether-radio
+    ports:
+      - "9000:9000/udp"
+    volumes:
+      - ./:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - target-host:/workspace/target
+    working_dir: /workspace
+    environment:
+      - RUST_LOG=info
+    command: >
+      bash -lc "cargo run -p aether-radio-cli --release -- host-recv
+      --net-config configs/backends/net_link_host.yaml
+      --symbols 64
+      --warmup-ms 1500"
+
+  fpga-sim:
+    build:
+      context: .
+      dockerfile: Dockerfile.fpga
+    container_name: aether-fpga-sim
+    networks:
+      - aether-radio
+    depends_on:
+      - host-dataplane
+    volumes:
+      - ./:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - target-fpga:/workspace/target
+    working_dir: /workspace
+    environment:
+      - RUST_LOG=info
+    command: >
+      bash -lc "sleep 2;
+      cargo run -p aether-radio-cli --release -- fpga-emit
+      --net-config configs/backends/net_link_fpga.yaml
+      --symbols 64
+      --interval-us 500"
+
+  host-dataplane-cuda:
+    profiles: ["cuda"]
+    build:
+      context: .
+      dockerfile: Dockerfile.cuda
+    container_name: aether-host-dataplane-cuda
+    gpus: all
+    networks:
+      - aether-radio
+    ports:
+      - "9000:9000/udp"
+    volumes:
+      - ./:/workspace
+      - cargo-registry:/root/.cargo/registry
+      - target-host-cuda:/workspace/target
+    working_dir: /workspace
+    environment:
+      - RUST_LOG=info
+      - NVIDIA_VISIBLE_DEVICES=all
+      - LD_LIBRARY_PATH=/usr/lib/wsl/lib:/usr/local/nvidia/lib64
+    command: >
+      bash -lc "cargo run -p aether-radio-cli --features cuda --release -- host-recv
+      --net-config configs/backends/net_link_host.yaml
+      --symbols 64
+      --use-cuda
+      --cuda-config configs/backends/gpu_cuda.yaml
+      --warmup-ms 2000"
+
+networks:
+  aether-radio:
+    driver: bridge
+
+volumes:
+  cargo-registry:
+  target-host:
+  target-fpga:
+  target-host-cuda:

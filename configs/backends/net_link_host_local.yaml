@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: net-link-host-local
+classification: external_integration_specific
+description: Host RX on localhost (dual-process smoke)
+bind_addr: "127.0.0.1:9000"
+peer_addr: ""
+recv_timeout_ms: 200
+max_datagram_bytes: 65535

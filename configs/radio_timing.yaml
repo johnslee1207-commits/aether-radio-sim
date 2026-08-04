@@ -1,0 +1,10 @@
+version: "1.0.0"
+id: radio-timing-nr-like
+classification: domain_common
+description: Slot/symbol timing used by FPGA slot scheduler (simulation, not 3GPP-complete)
+slots_per_sfn: 20
+symbols_per_slot: 14
+symbol_duration_ns: 714286
+samples_per_symbol: 64
+max_antennas: 8
+max_carriers: 4

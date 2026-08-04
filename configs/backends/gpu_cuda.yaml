@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: gpu-cuda-rtx4050
+classification: external_integration_specific
+description: CUDA backend for local WSL2/Docker RTX 4050
+device_id: 0
+scale: 1.0
+threads_per_block: 256
+expect_name_contains: "4050"

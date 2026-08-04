@@ -1,0 +1,10 @@
+[package]
+name = "memory-manager"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Unified host/GPU memory backend abstraction"
+
+[dependencies]
+thiserror = { workspace = true }
+serde = { workspace = true }

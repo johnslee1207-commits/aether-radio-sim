@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: shm-link-docker
+classification: external_integration_specific
+description: Shared named-volume path for Docker FPGA↔host µs-oriented ring
+path: /shm/aether_shm_link.bin
+slot_count: 64
+slot_bytes: 8192
+create: false

@@ -1,0 +1,6 @@
+version: "1.0.0"
+id: gpu-ring-default
+classification: project_specific
+slot_count: 8
+slot_bytes: 4096
+kernel_delay_us: 1.0

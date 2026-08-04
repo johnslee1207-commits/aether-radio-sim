@@ -1,0 +1,11 @@
+[package]
+name = "gpu-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "GPU PHY pipeline emulator (CPU sleep Phase 1, CUDA Phase 2)"
+
+[dependencies]
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }

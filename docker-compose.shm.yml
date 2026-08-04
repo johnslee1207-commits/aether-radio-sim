@@ -1,0 +1,61 @@
+# Same-host shared-memory FPGA ↔ host (file-backed ring on named volume).
+#
+# Usage (Linux / WSL Docker):
+#   docker compose -f docker-compose.shm.yml up --build
+#
+# The ring lives at /shm/aether_shm_link.bin (see configs/backends/shm_link_docker.yaml).
+# This is for µs-oriented same-host functional checks; not a 100G acceptance path.
+
+services:
+  host-dataplane-shm:
+    build:
+      context: .
+      dockerfile: Dockerfile.host
+    container_name: aether-host-dataplane-shm
+    volumes:
+      - ./:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - target-host-shm:/workspace/target
+      - shm-link:/shm
+    working_dir: /workspace
+    environment:
+      - RUST_LOG=info
+    command: >
+      bash -lc "mkdir -p /shm data/reports &&
+      cargo run -p aether-radio-cli --release -- shm-prepare
+      --shm-config configs/backends/shm_link_docker.yaml &&
+      cargo run -p aether-radio-cli --release -- host-recv
+      --transport shm
+      --shm-config configs/backends/shm_link_docker.yaml
+      --deadline configs/transport_deadline_net.yaml
+      --symbols 64
+      --warmup-ms 1500"
+
+  fpga-sim-shm:
+    build:
+      context: .
+      dockerfile: Dockerfile.fpga
+    container_name: aether-fpga-sim-shm
+    depends_on:
+      - host-dataplane-shm
+    volumes:
+      - ./:/workspace
+      - cargo-registry:/usr/local/cargo/registry
+      - target-fpga-shm:/workspace/target
+      - shm-link:/shm
+    working_dir: /workspace
+    environment:
+      - RUST_LOG=info
+    command: >
+      bash -lc "sleep 3;
+      cargo run -p aether-radio-cli --release -- fpga-emit
+      --transport shm
+      --shm-config configs/backends/shm_link_docker.yaml
+      --symbols 64
+      --interval-us 200"
+
+volumes:
+  cargo-registry:
+  target-host-shm:
+  target-fpga-shm:
+  shm-link:

@@ -1,0 +1,10 @@
+[package]
+name = "metrics-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Link, transport, and radio metrics collection"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }

@@ -1,0 +1,13 @@
+[package]
+name = "fpga-emulator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Remote Radio FPGA emulator: IQ source, slot scheduler, packetizer"
+
+[dependencies]
+aether-types = { workspace = true }
+aether-protocol = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = { workspace = true }

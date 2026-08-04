@@ -1,0 +1,23 @@
+version: "1.0.0"
+id: mvp-cuda-profile
+classification: project_specific
+platform: aether-radio-sim
+spec_version: "1.1"
+streams: 1
+antennas: 8
+carriers: 4
+target_bandwidth_gbps: 100
+target_throughput_gbs: 12.5
+latency_budget_us: 10.0
+backends:
+  packet_io: simulation
+  memory: simulation
+  gpu: cuda
+ethernet_config: configs/ethernet_model.yaml
+nic_config: configs/nic_dma.yaml
+fault_config: configs/fault_injection.yaml
+radio_timing_config: configs/radio_timing.yaml
+transport_deadline_config: configs/transport_deadline.yaml
+gpu_ring_config: configs/gpu_ring.yaml
+gpu_cuda_config: configs/backends/gpu_cuda.yaml
+bench_profile: configs/bench_profile.yaml

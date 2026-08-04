@@ -1,0 +1,57 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/aether-types",
+    "crates/aether-protocol",
+    "crates/aether-transport",
+    "crates/fpga-emulator",
+    "crates/ethernet-model",
+    "crates/cx5-emulator",
+    "crates/memory-manager",
+    "crates/gpu-runtime",
+    "crates/gpu-cuda",
+    "crates/net-io",
+    "crates/shm-io",
+    "crates/metrics-engine",
+    "crates/fault-injection",
+    "crates/benchmark",
+    "crates/cli",
+]
+
+[workspace.package]
+version = "0.1.1"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Aether Radio Sim"]
+repository = "https://github.com/aether-radio/aether-radio-sim"
+
+[workspace.dependencies]
+aether-types = { path = "crates/aether-types" }
+aether-protocol = { path = "crates/aether-protocol" }
+aether-transport = { path = "crates/aether-transport" }
+fpga-emulator = { path = "crates/fpga-emulator" }
+ethernet-model = { path = "crates/ethernet-model" }
+cx5-emulator = { path = "crates/cx5-emulator" }
+memory-manager = { path = "crates/memory-manager" }
+gpu-runtime = { path = "crates/gpu-runtime" }
+gpu-cuda = { path = "crates/gpu-cuda" }
+net-io = { path = "crates/net-io" }
+shm-io = { path = "crates/shm-io" }
+metrics-engine = { path = "crates/metrics-engine" }
+fault-injection = { path = "crates/fault-injection" }
+benchmark = { path = "crates/benchmark" }
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }
+clap = { version = "4", features = ["derive"] }
+anyhow = "1"
+criterion = "0.5"
+
+[profile.release]
+lto = true
+codegen-units = 1

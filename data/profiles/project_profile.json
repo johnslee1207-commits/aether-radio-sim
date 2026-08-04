@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "id": "aether-radio-sim",
+  "classification": "project_specific",
+  "name": "Aether Radio Data Plane Simulation Platform",
+  "spec_version": "1.1",
+  "default_simulation_profile": "configs/simulation_profile.yaml",
+  "mvp_success_criteria": {
+    "fpga_emulator_produces_data": true,
+    "transport_delivers_packets": true,
+    "memory_receives_payload": true,
+    "gpu_pipeline_simulated": true,
+    "metrics_complete": true
+  }
+}

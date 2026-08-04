@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: fault-injection-defaults
+classification: project_specific
+enabled: false
+loss_rate: 0.001
+extra_latency_us: 5.0
+burst_length: 10
+kernel_delay_us: 100.0

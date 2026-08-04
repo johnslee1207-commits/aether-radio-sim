@@ -1,0 +1,14 @@
+[package]
+name = "aether-protocol"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Aether Radio transport header encode/decode/validate"
+
+[dependencies]
+aether-types = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

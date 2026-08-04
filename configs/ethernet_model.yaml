@@ -1,0 +1,8 @@
+version: "1.0.0"
+id: ethernet-model-100g
+classification: project_specific
+bandwidth_gbps: 100
+mtu: 9000
+latency_ns: 1000
+jitter_ns: 500
+loss_rate: 0.0

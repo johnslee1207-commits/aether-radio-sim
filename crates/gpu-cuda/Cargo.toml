@@ -1,0 +1,21 @@
+[package]
+name = "gpu-cuda"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "CUDA GpuBackend for Aether Radio Sim (WSL2/Docker + RTX 40-series)"
+
+[features]
+default = []
+cuda = ["dep:cudarc"]
+
+[dependencies]
+gpu-runtime = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = { workspace = true }
+cudarc = { version = "0.13", optional = true, default-features = false, features = [
+    "driver",
+    "nvrtc",
+    "cuda-12040",
+] }
