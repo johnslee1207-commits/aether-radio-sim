@@ -62,6 +62,15 @@ enum Commands {
         #[arg(long, default_value = "aether-sim")]
         job: String,
     },
+    /// Write consolidated ops JSON report (bench + health + layered metrics)
+    OpsReport {
+        #[arg(long, default_value = "data/reports/ops_report.json")]
+        out: PathBuf,
+        #[arg(long, default_value = "configs/bench_profile.yaml")]
+        bench_profile: PathBuf,
+        #[arg(long, default_value = "configs/ops/observability.yaml")]
+        ops_config: PathBuf,
+    },
     /// Serve Prometheus text over HTTP (ops scrape; binds per configs/ops)
     PromServe {
         #[arg(long, default_value = "configs/ops/prometheus_scrape.yaml")]
@@ -181,6 +190,13 @@ async fn main() -> Result<()> {
         } => {
             run_prom_dump(&out, &bench_profile, &job)?;
         }
+        Commands::OpsReport {
+            out,
+            bench_profile,
+            ops_config,
+        } => {
+            run_ops_report(&out, &bench_profile, &ops_config)?;
+        }
         Commands::PromServe { config, once } => {
             run_prom_serve(&config, once)?;
         }
@@ -259,7 +275,7 @@ fn run_smoke(profile: &PathBuf) -> Result<()> {
     use gpu_runtime::GpuRingBuffer;
     use metrics_engine::{
         taxonomy, EventLogger, HealthManager, HealthThresholds, LogEvent, MetricsBackend,
-        MetricsEngine, ObservabilityConfig, TraceEngine, TraceStage,
+        MetricsEngine, ObservabilityConfig, RecoveryPolicy, TraceEngine, TraceStage,
     };
 
     let _profile_text = fs::read_to_string(profile)
@@ -268,10 +284,12 @@ fn run_smoke(profile: &PathBuf) -> Result<()> {
     let ops = ObservabilityConfig::load_path("configs/ops/observability.yaml")
         .context("load configs/ops/observability.yaml")?;
     let mut events = EventLogger::create(&ops.logging.events_path)?;
+    let recovery =
+        RecoveryPolicy::load_path(&ops.recovery.policy_path).context("load recovery policy")?;
     let _ = events.emit(
         &LogEvent::now(taxonomy::RUNTIME_STARTED)
             .with_component("cli")
-            .with_detail("smoke"),
+            .with_detail(format!("smoke recovery={}", recovery.id)),
     );
 
     let mut trace = TraceEngine::from_config(
@@ -360,13 +378,14 @@ fn run_smoke(profile: &PathBuf) -> Result<()> {
     let exported = trace.export_configured().unwrap_or(0);
 
     println!(
-        "smoke ok: rx={} tx={} now_ns={} seq_gaps={} late={} health={} traces_exported={} metrics={}",
+        "smoke ok: rx={} tx={} now_ns={} seq_gaps={} late={} health={} recovery={} traces_exported={} metrics={}",
         metrics.snapshot().link.rx_packets,
         metrics.snapshot().link.tx_packets,
         now,
         transport.sequence_gaps,
         transport.late_packets,
         health.state().as_str(),
+        recovery.id,
         exported,
         metrics.to_json()
     );
@@ -452,6 +471,56 @@ fn run_prom_dump(out: &PathBuf, bench_profile: &PathBuf, job: &str) -> Result<()
         "prom-dump ok: packets={} health={} out={}",
         report.packets,
         health.state().as_str(),
+        out.display()
+    );
+    Ok(())
+}
+
+fn run_ops_report(out: &PathBuf, bench_profile: &PathBuf, ops_config: &PathBuf) -> Result<()> {
+    use benchmark::{BenchProfile, PipelineBench};
+    use metrics_engine::{
+        render_prometheus_text, HealthManager, HealthThresholds, ObservabilityConfig,
+        RecoveryPolicy,
+    };
+    use serde_json::json;
+
+    let ops = ObservabilityConfig::load_path(ops_config)
+        .with_context(|| format!("load {}", ops_config.display()))?;
+    let recovery = RecoveryPolicy::load_path(&ops.recovery.policy_path)
+        .with_context(|| format!("load {}", ops.recovery.policy_path))?;
+    let mut profile = BenchProfile::load_path(bench_profile)
+        .with_context(|| format!("load {}", bench_profile.display()))?;
+    profile.symbol_count = profile.symbol_count.min(32);
+    let (report, metrics) = PipelineBench::new(profile)
+        .with_base_dir(".")
+        .run()
+        .context("bench for ops-report")?;
+    let thr = HealthThresholds::load_path(&ops.health.policy_path).unwrap_or_default();
+    let mut health = HealthManager::new(thr);
+    let _ = health.evaluate(&metrics.layered_snapshot(), None);
+    let prom = render_prometheus_text(
+        &metrics.layered_snapshot(),
+        Some(health.state()),
+        "aether-sim",
+    );
+    let body = json!({
+        "ops_config_id": ops.id,
+        "recovery_policy_id": recovery.id,
+        "health": health.state().as_str(),
+        "trace_enabled": ops.trace.enabled,
+        "bench": report,
+        "layered_metrics": metrics.layered_snapshot(),
+        "prometheus_text_bytes": prom.len(),
+    });
+    if let Some(parent) = out.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(out, serde_json::to_string_pretty(&body)?)
+        .with_context(|| format!("write {}", out.display()))?;
+    println!(
+        "ops-report ok: health={} packets={} out={}",
+        health.state().as_str(),
+        body["bench"]["packets"],
         out.display()
     );
     Ok(())

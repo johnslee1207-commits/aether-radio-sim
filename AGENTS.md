@@ -30,7 +30,7 @@ Coverage: `data/architecture/observability_coverage_matrix.json`.
 | 4 | Transport stream/sequence/timestamp — **Done** |
 | 5 | Host/GPU memory (+ ring BufferState) — **Done** |
 | 6 | Benchmark + metrics harness — **Done** |
-| O | Observability & Operations Plane — **O001–O015 Done** |
+| O | Observability & Operations Plane — **O001–O020 Done** |
 
 <!-- program-data-decoupling:start -->
 # Program/Data Decoupling
@@ -56,6 +56,7 @@ cargo run -p aether-radio-cli -- bench
 cargo run -p aether-radio-cli -- accept
 cargo run -p aether-radio-cli -- ops-status
 cargo run -p aether-radio-cli -- prom-dump
+cargo run -p aether-radio-cli -- ops-report
 cargo run -p aether-radio-cli -- soak --profile configs/soak_profile_ci.yaml
 cargo run -p aether-radio-cli -- fault-drill
 cargo run -p aether-radio-cli -- prom-serve --once

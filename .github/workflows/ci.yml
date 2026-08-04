@@ -34,6 +34,8 @@ jobs:
         run: cargo run -p aether-radio-cli -- prom-dump --out data/reports/metrics.prom
       - name: Soak CI
         run: cargo run -p aether-radio-cli -- soak --profile configs/soak_profile_ci.yaml
+      - name: Ops report
+        run: cargo run -p aether-radio-cli -- ops-report --out data/reports/ops_report.json
       - name: Fault drill
         run: cargo run -p aether-radio-cli -- fault-drill
       - name: Prom serve once

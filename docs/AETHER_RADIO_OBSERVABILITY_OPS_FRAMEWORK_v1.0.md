@@ -303,6 +303,11 @@ Agent 规则补充：
 | O013 | Prometheus HTTP scrape | **Done** — `prom-serve` |
 | O014 | Memory metrics + fault-drill | **Done** — `fault-drill` |
 | O015 | Matrix/maturity/CI closeout | **Done** — matrix v1.3 |
+| O016 | Soak multi-round health poll | **Done** — `rounds` / `round_health` |
+| O017 | Smoke Trace/Recovery parity | **Done** — recovery policy on smoke |
+| O018 | Prometheus scrape sample | **Done** — `configs/ops/prometheus.yml` |
+| O019 | Ops report JSON CLI | **Done** — `ops-report` |
+| O020 | Docs/matrix/CI closeout | **Done** — matrix v1.4 |
 
 ---
 

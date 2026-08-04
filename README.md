@@ -1,6 +1,6 @@
 # Aether Radio Data Plane Simulation Platform
 
-**Version:** v1.1 (crate `0.1.1`) · **Ops plane:** Sprint O O001–O015
+**Version:** v1.1 (crate `0.1.1`) · **Ops plane:** Sprint O O001–O020
 
 Software simulation of Aether Radio Transport, eCPRI-like deterministic streaming, CX5/DPDK/GPUDirect-style data paths, and GPU/CPU memory models — without Xilinx FPGA, Mellanox CX5, or GPU servers.
 
@@ -33,19 +33,22 @@ cargo run -p aether-radio-cli -- accept
 ```bash
 cargo run -p aether-radio-cli -- ops-status
 cargo run -p aether-radio-cli -- prom-dump
+cargo run -p aether-radio-cli -- ops-report
 cargo run -p aether-radio-cli -- soak --profile configs/soak_profile_ci.yaml
 cargo run -p aether-radio-cli -- fault-drill
 # Local Prometheus scrape (bind from configs/ops/prometheus_scrape.yaml):
 cargo run -p aether-radio-cli -- prom-serve --once
 # cargo run -p aether-radio-cli -- prom-serve   # listen until Ctrl-C
+# Optional: prometheus --config.file=configs/ops/prometheus.yml
 ```
 
 | Command | Purpose |
 |---------|---------|
 | `ops-status` | Print ops config (metrics / log / trace / health / recovery) |
 | `prom-dump` | Run short bench → write Prometheus text file |
+| `ops-report` | Consolidated JSON (bench + health + layered metrics) |
 | `prom-serve` | HTTP `GET /metrics` scrape endpoint (CLI-only sockets) |
-| `soak` | L4 soak/stress gates from soak profile YAML |
+| `soak` | L4 soak/stress gates (multi-round health poll) |
 | `fault-drill` | Stress faults + recovery policy exercise |
 | `accept` | Ethernet + PipelineBench SLA gates |
 
@@ -130,6 +133,7 @@ Tunable models live under `configs/` (not hardcoded in Rust):
 | `configs/ops/health_policy.yaml` | Health thresholds |
 | `configs/ops/recovery_policy.yaml` | Fault-class → recovery action |
 | `configs/ops/prometheus_scrape.yaml` | `prom-serve` bind / refresh |
+| `configs/ops/prometheus.yml` | Sample Prometheus scrape against `prom-serve` |
 | `configs/backends/gpu_cuda.yaml` | CUDA device / kernel policy (RTX 4050) |
 | `configs/backends/shm_link.yaml` | Same-host shared-memory ring geometry |
 | `configs/backends/shm_link_docker.yaml` | Docker named-volume shm path (`/shm/...`) |
@@ -224,4 +228,4 @@ Program/data decoupling: put bandwidth, latency, loss, DMA delay, fault rates, h
 GitHub Actions runs:
 
 - `cargo fmt --check`, `clippy -D warnings`, `cargo test --workspace`
-- CLI: `smoke`, `bench`, `accept` (+ multistream), `prom-dump`, `soak` (CI profile), `fault-drill`, `prom-serve --once`
+- CLI: `smoke`, `bench`, `accept` (+ multistream), `prom-dump`, `ops-report`, `soak` (CI multi-round), `fault-drill`, `prom-serve --once`

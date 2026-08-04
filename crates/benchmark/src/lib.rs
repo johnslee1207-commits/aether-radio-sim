@@ -11,7 +11,7 @@ pub use acceptance::{
 };
 pub use fault_drill::{FaultDrillError, FaultDrillProfile, FaultDrillReport, FaultDrillRunner};
 pub use pipeline::{BenchProfile, PipelineBench, PipelineBenchError};
-pub use soak::{SoakError, SoakGate, SoakProfile, SoakReport, SoakRunner};
+pub use soak::{SoakError, SoakGate, SoakProfile, SoakReport, SoakRoundHealth, SoakRunner};
 
 use serde::{Deserialize, Serialize};
 

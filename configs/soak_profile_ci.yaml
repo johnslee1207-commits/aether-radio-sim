@@ -11,3 +11,5 @@ events_path: data/reports/soak_ci_events.jsonl
 max_sequence_gaps: 0
 max_deadline_miss_ratio: 1.0
 min_packets: 32
+rounds: 2
+require_health_normal: true
