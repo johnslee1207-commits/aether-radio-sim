@@ -1,18 +1,20 @@
 {
   "schema_version": "1.0.0",
   "project_id": "aether-radio-sim",
-  "current_stage": "GOAL_BATCH_G0_G1_G2",
+  "current_stage": "GOAL_BATCH_G0_G1_G2_COMPLETE",
   "status": "RUNNING",
   "state_version": 1,
-  "last_verified_commit": null,
-  "active_task_ids": ["G0", "G1", "G2"],
+  "last_verified_commit": "e03bf00",
+  "active_task_ids": [],
   "completed_gate_ids": [],
-  "pending_decisions": [],
+  "pending_decisions": [
+    "select_next_user_goal_batch"
+  ],
   "blocked_reasons": [],
-  "latest_evidence_bundle": ".aetheros/evidence/goal_batch_g0_g1_g2_confirmation.json",
-  "ready_for": null,
+  "latest_evidence_bundle": ".aetheros/evidence/goal_batch_g0_g1_g2_manifest.json",
+  "ready_for": "user_select_next_goals",
   "goal_backlog": ".aetheros/plans/user_goal_backlog.yaml",
-  "selected_goal_batch": ["G0", "G1", "G2"],
+  "completed_goal_batch": ["G0", "G1", "G2"],
   "authorization_boundary": {
     "granted": [
       "trusted_context",
@@ -24,6 +26,6 @@
     "denied": []
   },
   "selected_milestone": "M1_ops_scrape_stack_evidence",
-  "milestone_status": "compose_soak_cuda_pass",
+  "milestone_status": "g0_g1_g2_pass",
   "plan_root": ".aetheros/plans/m1-ops-scrape-stack/"
 }

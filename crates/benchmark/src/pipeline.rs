@@ -207,6 +207,7 @@ impl PipelineBench {
         let mut ring_peak = 0u64;
         let mut injector = fault_injection::FaultInjector::new(fault.clone());
 
+        #[allow(unused_mut)] // required when `cuda` feature mutably borrows cuda_gpu
         let mut process_one = |packet: Packet,
                            now_ns: &mut u64,
                            metrics: &mut MetricsEngine,

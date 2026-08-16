@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-08-16T14:49:45.2370750Z",
+  "topology": "compose_profile_full_in_container_prom_serve",
+  "compose_files": [
+    "docker-compose.ops.yml",
+    "docker-compose.ops.full.yml"
+  ],
+  "metrics_status": 200,
+  "metrics_len": 2526,
+  "up_targets": 1,
+  "up_jobs": [
+    "aether-sim"
+  ],
+  "grafana_ok": true,
+  "result": "PASS"
+}

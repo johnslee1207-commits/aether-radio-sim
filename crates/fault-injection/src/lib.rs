@@ -38,7 +38,7 @@ impl FaultInjectionConfig {
             return false;
         }
         let period = (1.0 / self.loss_rate).round().max(1.0) as u64;
-        sequence.is_multiple_of(period)
+        sequence % period == 0
     }
 
     /// Burst loss: drop `burst_length` packets starting at `burst_start` inclusive.

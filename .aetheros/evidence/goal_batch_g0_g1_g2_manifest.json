@@ -1,0 +1,37 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "EvidenceManifest",
+  "metadata": {
+    "id": "goal_batch_g0_g1_g2",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T14:45:00Z"
+  },
+  "confirmation": ".aetheros/evidence/goal_batch_g0_g1_g2_confirmation.json",
+  "items": [
+    {
+      "id": "G0",
+      "status": "PASS",
+      "commit": "e03bf00",
+      "notes": "Baseline commit of .aetheros/.cursor/ops compose/configs/evidence"
+    },
+    {
+      "id": "G1",
+      "status": "PASS",
+      "artifacts": [
+        "docker-compose.ops.full.yml",
+        ".aetheros/evidence/m1_compose_full/compose_full_proof.json"
+      ],
+      "notes": "In-container prom-serve; Prometheus aether-sim UP; Grafana health ok; fixed fault-injection is_multiple_of for Rust 1.85 Docker toolchain"
+    },
+    {
+      "id": "G2",
+      "status": "PASS",
+      "artifacts": [
+        "configs/soak_profile_wall_long.yaml",
+        ".aetheros/evidence/soak_wall_long/summary.json"
+      ],
+      "notes": "elapsed_wall_ms=120122; rounds=7; health NORMAL"
+    }
+  ],
+  "overall": "PASS"
+}

@@ -1,0 +1,113 @@
+{
+  "profile_id": "soak-wall-long",
+  "passed": true,
+  "gates": [
+    {
+      "name": "min_packets",
+      "passed": true,
+      "detail": "448 >= 64"
+    },
+    {
+      "name": "max_sequence_gaps",
+      "passed": true,
+      "detail": "0 <= 0"
+    },
+    {
+      "name": "max_deadline_miss_ratio",
+      "passed": true,
+      "detail": "0.0000 <= 1"
+    },
+    {
+      "name": "rounds_completed",
+      "passed": true,
+      "detail": "7 == 7"
+    },
+    {
+      "name": "health_normal_each_round",
+      "passed": true,
+      "detail": "[\"NORMAL\", \"NORMAL\", \"NORMAL\", \"NORMAL\", \"NORMAL\", \"NORMAL\", \"NORMAL\"]"
+    }
+  ],
+  "bench": {
+    "throughput": {
+      "gbps": 0.005824896945959851,
+      "gbs": 0.0007281121182449813,
+      "pps": 1422.0939809472293
+    },
+    "latency": {
+      "min_ns": 4040,
+      "p50_ns": 4040,
+      "p99_ns": 4040,
+      "p999_ns": 4040,
+      "max_ns": 4040
+    },
+    "radio": {
+      "slot_miss": 0,
+      "symbol_miss": 0
+    },
+    "packets": 448,
+    "bytes": 229376,
+    "sequence_gaps": 0,
+    "late_packets": 0,
+    "sim_duration_ns": 315028406,
+    "recovery_actions": 0,
+    "ring_occupancy_peak": 1
+  },
+  "fault_config": "configs/fault_injection.yaml",
+  "health": "NORMAL",
+  "recovery_actions": 0,
+  "rounds": 7,
+  "round_health": [
+    {
+      "round": 1,
+      "health": "NORMAL",
+      "packets": 64,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 2,
+      "health": "NORMAL",
+      "packets": 64,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 3,
+      "health": "NORMAL",
+      "packets": 64,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 4,
+      "health": "NORMAL",
+      "packets": 64,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 5,
+      "health": "NORMAL",
+      "packets": 64,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 6,
+      "health": "NORMAL",
+      "packets": 64,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 7,
+      "health": "NORMAL",
+      "packets": 64,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    }
+  ],
+  "elapsed_wall_ms": 120122,
+  "round_interval_ms": 20000
+}
