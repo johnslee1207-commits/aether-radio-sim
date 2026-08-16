@@ -14,4 +14,5 @@ mbuf_pool_size: 1024
 burst_size: 32
 poll_cost_ns: 50
 hugepage_mb: 0
-notes: Prefer SimPacketIO for unit tests; use mock for DPDK-shaped integration.
+adapter_contract: configs/backends/dpdk_adapter_contract.yaml
+notes: Prefer SimPacketIO for unit tests; use mock for DPDK-shaped integration. See crates/dpdk-adapter for hardware probe stub.

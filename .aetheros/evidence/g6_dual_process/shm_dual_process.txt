@@ -1,0 +1,17 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.60s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.72s
+     Running `target/debug/aether-radio-sim shm-prepare --shm-config configs/backends/shm_link.yaml`
+shm-prepare ok: path=data/reports/shm_link.bin
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.24s
+     Running `target/debug/aether-radio-sim fpga-emit --transport shm --shm-config configs/backends/shm_link.yaml --symbols 32 --interval-us 50`
+fpga-emit ok: transport=shm sent=32 path=data/reports/shm_link.bin
+./scripts/shm_dual_smoke.sh: line 30:   600 Bus error               (core dumped) cargo run -p aether-radio-cli -- host-recv --transport shm --shm-config configs/backends/shm_link.yaml --deadline configs/transport_deadline_net.yaml --symbols 32 --warmup-ms 200 > "$HOST_LOG" 2>&1
+---- host-recv log ----
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.45s
+     Running `target/debug/aether-radio-sim host-recv --transport shm --shm-config configs/backends/shm_link.yaml --deadline configs/transport_deadline_net.yaml --symbols 32 --warmup-ms 200`
+shm dual-process smoke done

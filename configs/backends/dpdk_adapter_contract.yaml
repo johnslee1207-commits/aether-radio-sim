@@ -1,0 +1,27 @@
+# DPDK / DOCA hardware adapter contract (spike)
+# classification: external_integration_specific
+#
+# This file is the data-plane policy for a future adapter crate.
+# It does NOT enable hardware. Business crates must keep using PacketIO mocks.
+schema_version: 1.0.0
+id: dpdk-adapter-contract
+status: spike
+default_backend: mock
+hardware_enabled: false
+adapter_crate: dpdk-adapter
+forbidden_in_business_crates:
+  - libdpdk
+  - libdoca
+  - raw_pci_bind
+required_adapter_capabilities:
+  - probe_device
+  - open_port
+  - rx_burst
+  - tx_burst
+  - close
+failure_policy:
+  when_hardware_requested_without_adapter: BackendUnavailable
+  fallback: mock
+notes:
+  - Ports, PCI BDF, hugepage sizes stay in configs/backends (local_machine overlays later)
+  - No secrets or absolute host paths in this contract

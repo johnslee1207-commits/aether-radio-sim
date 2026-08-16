@@ -1,0 +1,16 @@
+{
+  "checked_at": "2026-08-16T15:55:00Z",
+  "status": "PASS",
+  "scope": "spike_no_libdpdk",
+  "artifacts": [
+    ".aetheros/plans/g7-dpdk-adapter/adr_g7_001_dpdk_adapter_boundary.md",
+    "configs/backends/dpdk_adapter_contract.yaml",
+    "crates/dpdk-adapter/",
+    "configs/backends/dpdk.yaml"
+  ],
+  "tests": {
+    "dpdk-adapter": "2 passed",
+    "cx5-emulator": "4 passed including dpdk_hardware_is_unavailable"
+  },
+  "hardware_enabled": false
+}

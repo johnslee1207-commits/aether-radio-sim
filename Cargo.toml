@@ -16,6 +16,7 @@ members = [
     "crates/fault-injection",
     "crates/benchmark",
     "crates/cli",
+    "crates/dpdk-adapter",
 ]
 
 [workspace.package]
@@ -40,6 +41,7 @@ shm-io = { path = "crates/shm-io" }
 metrics-engine = { path = "crates/metrics-engine" }
 fault-injection = { path = "crates/fault-injection" }
 benchmark = { path = "crates/benchmark" }
+dpdk-adapter = { path = "crates/dpdk-adapter" }
 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

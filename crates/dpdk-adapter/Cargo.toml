@@ -1,0 +1,13 @@
+[package]
+name = "dpdk-adapter"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Stub DPDK/DOCA adapter boundary — never links libdpdk in this spike"
+
+[dependencies]
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]

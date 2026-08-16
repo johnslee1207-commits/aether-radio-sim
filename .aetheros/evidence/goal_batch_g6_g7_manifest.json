@@ -1,0 +1,28 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "EvidenceManifest",
+  "metadata": {
+    "id": "goal_batch_g6_g7",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T15:56:00Z"
+  },
+  "precondition": {
+    "git_push": "origin/master @ 893724c (b5f127c..893724c)"
+  },
+  "confirmation": ".aetheros/evidence/goal_batch_g6_g7_confirmation.json",
+  "items": [
+    {
+      "id": "G6",
+      "status": "PASS",
+      "artifacts": [".aetheros/evidence/g6_dual_process/summary.json"],
+      "notes": "UDP dual-process PASS; SHM Bus error on WSL recorded as PARTIAL"
+    },
+    {
+      "id": "G7",
+      "status": "PASS",
+      "artifacts": [".aetheros/evidence/g7_dpdk_spike/summary.json"],
+      "notes": "ADR + contract + dpdk-adapter stub; hardware remains unavailable; no libdpdk"
+    }
+  ],
+  "overall": "PASS"
+}
