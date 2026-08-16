@@ -1,0 +1,48 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "PendingDecisionConfirmation",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T06:50:00Z",
+    "source": "user_message"
+  },
+  "confirmations": [
+    {
+      "decision_id": "confirm_first_rd_milestone",
+      "choice": "M1_ops_scrape_stack_evidence",
+      "title": "Governed ops scrape stack evidence pack",
+      "scope": [
+        "prom-serve",
+        "Prometheus",
+        "Grafana",
+        "reproducible_ops_evidence_loop"
+      ],
+      "excluded_from_m1": ["CUDA", "DPDK", "FPGA", "real_hardware_specializations"]
+    },
+    {
+      "decision_id": "confirm_intent_contract_promotion",
+      "choice": "promote_draft_to_approved",
+      "authorization": [
+        "trusted_context",
+        "architecture_planning",
+        "verification_planning"
+      ],
+      "not_authorized": [
+        "business_code_implementation",
+        "implementation_gate"
+      ]
+    },
+    {
+      "decision_id": "classify_special_hardware",
+      "choice": "optional_cuda_wsl2",
+      "m1_gate_dependency": false,
+      "deferred_candidates": ["CUDA", "DPDK", "FPGA", "real_hardware"]
+    }
+  ],
+  "state_policy": {
+    "mutate_completed_gate_ids": false,
+    "mutate_state_version": false,
+    "next_command": "/aetheros-continue"
+  }
+}

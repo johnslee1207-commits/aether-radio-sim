@@ -1,0 +1,84 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "M1ContextManifest",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "milestone_id": "M1_ops_scrape_stack_evidence",
+    "generatedAt": "2026-08-16T06:52:30Z",
+    "stage": "M1_PLANNING",
+    "authority": "trusted_context",
+    "implementation_authorized": false
+  },
+  "intent_bound": {
+    "contract": ".aetheros/intent-contract.yaml",
+    "status": "approved",
+    "authorization_granted": [
+      "trusted_context",
+      "architecture_planning",
+      "verification_planning"
+    ],
+    "authorization_denied": [
+      "business_code_implementation",
+      "implementation_gate"
+    ]
+  },
+  "facts": [
+    {
+      "id": "exporter_default",
+      "statement": "CLI prom-serve binds 127.0.0.1:9898 and serves /metrics by default.",
+      "sources": ["configs/ops/prometheus_scrape.yaml", "crates/cli/src/main.rs", "README.md"]
+    },
+    {
+      "id": "prometheus_sample",
+      "statement": "Sample Prometheus config scrapes job aether-sim at 127.0.0.1:9898.",
+      "sources": ["configs/ops/prometheus.yml"]
+    },
+    {
+      "id": "grafana_datasource_sample",
+      "statement": "Grafana datasource sample points at http://127.0.0.1:9090.",
+      "sources": ["data/ops/grafana/datasources/prometheus.yaml"]
+    },
+    {
+      "id": "grafana_dashboard_sample",
+      "statement": "Overview dashboard JSON exists at data/ops/dashboards/aether_radio_overview.json.",
+      "sources": ["data/ops/dashboards/aether_radio_overview.json", "data/ops/dashboards/README.md"]
+    },
+    {
+      "id": "compose_ops_absent",
+      "statement": "No docker-compose.ops.yml; existing compose files are cuda/shm/split dataplane only.",
+      "sources": ["docker-compose.cuda.yml", "docker-compose.shm.yml", "docker-compose.split.yml"]
+    },
+    {
+      "id": "m1_hardware_independent",
+      "statement": "M1 must not depend on CUDA, DPDK, FPGA, or real hardware.",
+      "sources": [".aetheros/intent-contract.yaml", ".aetheros/capability-profile.yaml"]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "host_local_first_verification",
+      "statement": "Initial evidence can use host-local prom-serve + optional host Prometheus/Grafana before any new Compose file exists.",
+      "needs_confirmation": true
+    }
+  ],
+  "non_goals": [
+    "Long wall-clock soak",
+    "Business crate changes",
+    "Implementation of docker-compose.ops.yml in this pass",
+    "CUDA/DPDK/FPGA specialization"
+  ],
+  "open_gaps": [
+    "Compose networking topology not confirmed",
+    "M1 acceptance criteria awaiting user confirmation",
+    "Evidence pack filename schema not finalized beyond this plan"
+  ],
+  "related_artifacts": [
+    ".aetheros/trusted-context-manifest.json",
+    ".aetheros/plans/m1-ops-scrape-stack/context_completeness_report.json",
+    ".aetheros/plans/m1-ops-scrape-stack/entrypoints_inventory.json",
+    ".aetheros/plans/m1-ops-scrape-stack/acceptance_criteria.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/evidence_plan.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/verification_command_candidates.yaml"
+  ]
+}

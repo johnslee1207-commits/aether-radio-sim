@@ -1,0 +1,14 @@
+# Override for docker-compose.ops.yml --profile full
+# Usage:
+#   docker compose -f docker-compose.ops.yml -f docker-compose.ops.full.yml --profile full up --build -d
+# Tear down:
+#   docker compose -f docker-compose.ops.yml -f docker-compose.ops.full.yml --profile full down
+#
+# classification: external_integration_specific
+
+services:
+  prometheus:
+    volumes:
+      - ./configs/ops/prometheus_compose_full.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - prom-serve

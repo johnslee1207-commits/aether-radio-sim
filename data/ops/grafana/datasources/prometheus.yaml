@@ -1,0 +1,18 @@
+# Grafana provisioning — Prometheus datasource for aether-radio-sim.
+# Place under Grafana provisioning/datasources/ or import manually.
+# Start: cargo run -p aether-radio-cli -- prom-serve
+# Optional Prometheus: prometheus --config.file=configs/ops/prometheus.yml
+#
+# classification: local_machine_specific (URL / org)
+
+apiVersion: 1
+
+datasources:
+  - name: Aether Radio Sim
+    type: prometheus
+    access: proxy
+    url: http://127.0.0.1:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 5s

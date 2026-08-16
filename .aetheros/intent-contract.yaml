@@ -1,0 +1,77 @@
+schema_version: 1.0.0
+status: approved
+project_id: aether-radio-sim
+intent: >-
+  将该项目接入 AetherOS 自主研发模式，用于后续无线电/通信仿真相关研发。
+  第一研发里程碑 M1：Governed ops scrape stack evidence pack
+  （prom-serve + Prometheus + Grafana + reproducible ops evidence 闭环）。
+target_users:
+  - AetherOS R&D operators (Cursor harness)
+  - Radio/communication simulation developers
+scope:
+  - Govern aether-radio-sim under AetherOS autonomous R&D
+  - M1: reproducible ops evidence loop (prom-serve + Prometheus + Grafana)
+  - Authorized after this promotion: trusted context, architecture planning, verification planning
+non_goals:
+  - Do not authorize business/source crate implementation in this promotion
+  - Do not enter implementation gate
+  - Do not make CUDA / DPDK / FPGA / real hardware a current gate condition
+  - Do not self-approve completed_gate_ids or mutate state_version
+constraints:
+  - Program/data decoupling: policies stay in configs/ and data/
+  - Interface → test → mock → backend; no hardware sockets in business crates
+  - Autonomy remains L1 until smoke/capability promotion
+  - M1 must not depend on CUDA, DPDK, FPGA, or real hardware
+  - Promotion authorization is limited to context / architecture / verification planning
+success_metrics:
+  - Intent contract status is approved with explicit authorization boundary
+  - M1 milestone recorded and confirmed
+  - Special hardware classified as optional_cuda_wsl2 without blocking M1
+  - Pending intake decisions cleared; ready for /aetheros-continue
+  - No business code changes in this confirmation pass
+kpi_candidates:
+  - intent_contract_approved: true
+  - m1_selected: M1_ops_scrape_stack_evidence
+  - implementation_gate_entered: false
+  - business_code_diff_in_confirmation: 0
+milestone:
+  id: M1_ops_scrape_stack_evidence
+  title: Governed ops scrape stack evidence pack
+  status: selected
+  deliverables:
+    - prom-serve scrape path
+    - Prometheus integration
+    - Grafana dashboards/datasource path
+    - Reproducible ops evidence bundle
+  deferred:
+    - CUDA specialization
+    - DPDK specialization
+    - FPGA specialization
+    - Real hardware adapters
+authorization:
+  granted:
+    - trusted_context
+    - architecture_planning
+    - verification_planning
+  denied:
+    - business_code_implementation
+    - implementation_gate
+open_decisions: []
+user_confirmation_refs:
+  - source: user_message
+    at: "2026-08-16T06:47:00Z"
+    statement: >-
+      确认当前 intent contract，并继续 AetherOS intake；目标为接入 AetherOS
+      自主研发模式用于后续无线电/通信仿真相关研发；仅允许结构/栈/入口/能力/风险/里程碑建议
+      与草案更新；禁止业务代码与 architecture/implementation gate。
+  - source: user_message
+    at: "2026-08-16T06:50:00Z"
+    statement: >-
+      确认 M1 ops scrape stack；promote intent-contract 为 approved（仅授权 context/
+      architecture/verification planning）；special hardware = optional CUDA WSL2；
+      M1 不依赖 CUDA/DPDK/FPGA/真实硬件；更新 pending decisions 与 lineage；
+      准备 /aetheros-continue；仍禁止业务代码与 implementation gate。
+evidence_refs:
+  - .aetheros/evidence/bootstrap_report.json
+  - .aetheros/evidence/intake_morphology_report.json
+  - .aetheros/evidence/pending_decision_confirmation_2026-08-16.json

@@ -1,0 +1,9 @@
+---
+description: Separate implementation, verification, and evidence audit authority.
+alwaysApply: true
+---
+
+- Implementation agents cannot approve their own work.
+- Verification and evidence auditing must use separate task contracts and separate role context.
+- An evidence auditor must not modify the implementation being audited.
+- A parent agent must not promote `PARTIAL` subagent output to `SUCCEEDED`.

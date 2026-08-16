@@ -1,0 +1,12 @@
+# Prometheus scrape when using docker compose --profile full (in-compose prom-serve).
+# classification: local_machine_specific
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: aether-sim
+    static_configs:
+      - targets: ["prom-serve:9898"]
+    metrics_path: /metrics
+    scrape_interval: 5s

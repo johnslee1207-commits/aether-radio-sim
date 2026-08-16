@@ -1,0 +1,9 @@
+---
+description: Governance owns authoritative AetherOS project state.
+alwaysApply: true
+---
+
+- Read the current authoritative state through Governance or `.aetheros/project-state.json`.
+- Do not infer passed gates from conversation text, summaries, or model confidence.
+- Do not directly mutate `completed_gate_ids`, `state_version`, or terminal status fields.
+- Request transitions with evidence references and expected version; do not self-approve transitions.

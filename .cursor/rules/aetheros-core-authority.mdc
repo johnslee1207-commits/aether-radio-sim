@@ -1,0 +1,16 @@
+---
+description: AetherOS canonical core authority invariant for Cursor.
+alwaysApply: true
+---
+
+- AetherOS Canonical Process and approved core contracts are authoritative.
+- Cursor is an execution harness and must not redefine core process, gates, states, or evidence semantics.
+- Cursor-specific behavior belongs under `materializations/cursor/` or project `.cursor/`.
+- If a core semantic conflict is found, create a conflict record and stop promotion until governance resolves it.
+
+Natural-language routing:
+
+- Any user request that says or implies "I want to implement", "希望实现", "要做", "新增", "优化", "修复", "改进", or similar R&D/development intent must default to AetherOS intake first.
+- Intake means: read `.aetheros/project-state.json`, identify current stage and pending decisions, draft or update intent/context/risk/acceptance criteria, and stop at the next user-confirmation gate.
+- Do not directly edit business code for such requests unless the user explicitly says to skip AetherOS governance or directly authorizes code changes.
+- If the user explicitly says "跳过 AetherOS", "直接改代码", or equivalent, still preserve security, evidence, and no-self-approval constraints.

@@ -1,0 +1,9 @@
+---
+description: Domain packs extend AetherOS without changing core contracts.
+alwaysApply: false
+---
+
+- Domain-specific facts, standards, ontology, KPI thresholds, and source policies belong in domain packs.
+- A new domain must not require Cursor rule changes or AetherOS core schema changes.
+- Domain claims must carry provenance, scope, and confidence.
+- If domain context is insufficient, return `BLOCKED_CONTEXT` instead of guessing.

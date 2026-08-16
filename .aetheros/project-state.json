@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.0.0",
+  "project_id": "aether-radio-sim",
+  "current_stage": "GOAL_BATCH_G0_G1_G2",
+  "status": "RUNNING",
+  "state_version": 1,
+  "last_verified_commit": null,
+  "active_task_ids": ["G0", "G1", "G2"],
+  "completed_gate_ids": [],
+  "pending_decisions": [],
+  "blocked_reasons": [],
+  "latest_evidence_bundle": ".aetheros/evidence/goal_batch_g0_g1_g2_confirmation.json",
+  "ready_for": null,
+  "goal_backlog": ".aetheros/plans/user_goal_backlog.yaml",
+  "selected_goal_batch": ["G0", "G1", "G2"],
+  "authorization_boundary": {
+    "granted": [
+      "trusted_context",
+      "architecture_planning",
+      "verification_planning",
+      "implementation_items_1_2_3",
+      "goal_batch_G0_G1_G2"
+    ],
+    "denied": []
+  },
+  "selected_milestone": "M1_ops_scrape_stack_evidence",
+  "milestone_status": "compose_soak_cuda_pass",
+  "plan_root": ".aetheros/plans/m1-ops-scrape-stack/"
+}

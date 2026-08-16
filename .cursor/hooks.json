@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "python .cursor/hooks/aetheros_hook.py sessionStart"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "python .cursor/hooks/aetheros_hook.py beforeShellExecution"
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": "python .cursor/hooks/aetheros_hook.py afterShellExecution"
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "python .cursor/hooks/aetheros_hook.py afterFileEdit"
+      }
+    ],
+    "subagentStart": [
+      {
+        "command": "python .cursor/hooks/aetheros_hook.py subagentStart"
+      }
+    ],
+    "subagentStop": [
+      {
+        "command": "python .cursor/hooks/aetheros_hook.py subagentStop"
+      }
+    ],
+    "stop": [
+      {
+        "command": "python .cursor/hooks/aetheros_hook.py stop"
+      }
+    ]
+  }
+}

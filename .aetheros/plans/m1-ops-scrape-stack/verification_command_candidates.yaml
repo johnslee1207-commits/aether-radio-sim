@@ -1,0 +1,99 @@
+schema_version: 1.0.0
+kind: M1VerificationCommandCandidates
+project_id: aether-radio-sim
+milestone_id: M1_ops_scrape_stack_evidence
+generated_at: "2026-08-16T06:52:30Z"
+status: candidates_only
+note: >-
+  Candidates for a future verification pass. This planning turn does not execute
+  them. Do not run long soak. Do not use CUDA feature for M1.
+
+windows_powershell_cwd: D:\Projects\aether-radio-sim
+
+candidates:
+  - id: VC-01
+    purpose: AC-M1-01 metrics exporter once-scrape
+    risk: low
+    command: >
+      cargo run -p aether-radio-cli -- prom-serve --once
+    expects:
+      - exit 0
+      - successful /metrics serve/scrape once
+
+  - id: VC-02
+    purpose: AC-M1-01 offline metrics text dump (alternate/supplement)
+    risk: low
+    command: >
+      cargo run -p aether-radio-cli -- prom-dump --out data/reports/metrics.prom
+    expects:
+      - data/reports/metrics.prom created/non-empty
+
+  - id: VC-03
+    purpose: AC-M1-02 ops report JSON
+    risk: low
+    command: >
+      cargo run -p aether-radio-cli -- ops-report --out data/reports/ops_report.json
+    expects:
+      - data/reports/ops_report.json created
+
+  - id: VC-04
+    purpose: ops plane config sanity (non-blocking helper)
+    risk: low
+    command: >
+      cargo run -p aether-radio-cli -- ops-status
+    expects:
+      - prints metrics/log/trace/health/recovery status
+
+  - id: VC-05
+    purpose: AC-M1-03 Prometheus config presence review
+    risk: none
+    command: >
+      Get-Content configs/ops/prometheus.yml
+    expects:
+      - job_name aether-sim
+      - targets include 127.0.0.1:9898
+
+  - id: VC-06
+    purpose: AC-M1-04 Grafana assets presence review
+    risk: none
+    command: >
+      Test-Path data/ops/grafana/datasources/prometheus.yaml;
+      Test-Path data/ops/dashboards/aether_radio_overview.json
+    expects:
+      - both True
+
+  - id: VC-07
+    purpose: optional live Prometheus (only if prometheus binary installed)
+    risk: medium
+    optional: true
+    command: >
+      prometheus --config.file=configs/ops/prometheus.yml
+    notes:
+      - Long-running process; start only in a dedicated terminal for short smoke
+      - Not required to complete planning; not a soak
+
+  - id: VC-08
+    purpose: optional Prometheus targets API snapshot (if VC-07 running)
+    risk: low
+    optional: true
+    command: >
+      Invoke-WebRequest -Uri http://127.0.0.1:9090/api/v1/targets -UseBasicParsing
+    expects:
+      - aether-sim target health up
+
+explicitly_excluded_commands:
+  - id: X-01
+    command: cargo run -p aether-radio-cli -- soak --profile configs/soak_profile.yaml
+    reason: long/wall-clock soak not allowed in this planning pass
+  - id: X-02
+    command: cargo run -p aether-radio-cli --features cuda -- smoke-cuda
+    reason: CUDA out of M1 scope
+  - id: X-03
+    command: docker compose -f docker-compose.ops.yml up --build
+    reason: ops compose file does not exist; implementation not authorized
+
+recommended_minimal_future_verify_set:
+  - VC-01
+  - VC-03
+  - VC-05
+  - VC-06

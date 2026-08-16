@@ -11,3 +11,5 @@ max_late_packets: 200
 max_symbol_miss: 200
 min_packets: 64
 report_path: data/reports/acceptance_last.json
+health_policy: configs/ops/health_policy.yaml
+require_health_normal: true

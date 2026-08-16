@@ -1,0 +1,75 @@
+schema_version: 1.0.0
+kind: VModelVerificationPlan
+project_id: aether-radio-sim
+milestone_id: M1_ops_scrape_stack_evidence
+generated_at: "2026-08-16T06:51:30Z"
+status: draft_pending_user_confirmation
+authorization: verification_planning_only
+implementation_gate: denied
+
+requirement_to_verification:
+  - requirement_id: M1-R1
+    requirement: "prom-serve exposes Prometheus text at configured bind/path"
+    requirement_level: component
+    verification_level: component_test_or_smoke
+    method: "HTTP GET /metrics returns 200 and Prometheus text content-type/body markers"
+    evidence_required:
+      - http_status
+      - metrics_snippet_or_hash
+      - scrape_config_path_ref
+
+  - requirement_id: M1-R2
+    requirement: "Prometheus scrapes aether-sim job successfully"
+    requirement_level: integration
+    verification_level: integration_smoke
+    method: "Prometheus targets API or UI shows job aether-sim UP within scrape interval"
+    evidence_required:
+      - prometheus_targets_snapshot
+      - prometheus_config_ref
+
+  - requirement_id: M1-R3
+    requirement: "Grafana can query Prometheus and load overview dashboard"
+    requirement_level: integration
+    verification_level: integration_smoke
+    method: "Datasource health OK; dashboard JSON importable/provisioned without error"
+    evidence_required:
+      - grafana_datasource_health
+      - dashboard_uid_or_path_ref
+
+  - requirement_id: M1-R4
+    requirement: "Reproducible ops evidence bundle is produced"
+    requirement_level: system
+    verification_level: acceptance
+    method: "Single documented procedure yields ops-report + scrape proofs under governed paths"
+    evidence_required:
+      - ops_report_json_path
+      - evidence_bundle_manifest
+      - procedure_command_list
+
+  - requirement_id: M1-R5
+    requirement: "M1 does not depend on CUDA/DPDK/FPGA/real hardware"
+    requirement_level: constraint
+    verification_level: review
+    method: "Procedure and compose/profile review show simulation/default ops path only"
+    evidence_required:
+      - architecture_review_note
+      - profile_feature_flags_review
+
+non_goals_verification:
+  - Do not require cuda feature builds
+  - Do not require libdpdk or FPGA bitstreams
+  - Do not rewrite acceptance criteria to pass weak evidence
+
+independent_verifier_notes:
+  - Implementation agent must not approve this plan's execution results
+  - Future /aetheros-verify must use separate role context
+  - This artifact is planning-only; no tests executed in this continue pass
+
+proposed_acceptance_contract_hooks:
+  - commands_candidate:
+      - "cargo run -p aether-radio-cli -- prom-serve --once"
+      - "cargo run -p aether-radio-cli -- ops-report"
+      - "docker compose -f docker-compose.ops.yml up --build  # when authorized/created"
+  - artifact_roots:
+      - data/reports/
+      - .aetheros/evidence/

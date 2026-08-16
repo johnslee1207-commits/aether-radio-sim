@@ -1,0 +1,12 @@
+# Compose overlay for prom-serve (reachable from Prometheus container).
+# classification: local_machine_specific (bind address)
+version: "1.0.0"
+id: prometheus-scrape-compose
+classification: local_machine_specific
+description: Compose prom-serve bind (0.0.0.0) for inter-container scrape
+bind: "0.0.0.0:9898"
+path: /metrics
+refresh_on_scrape: true
+bench_profile: configs/bench_profile.yaml
+symbol_count: 8
+job: aether-sim

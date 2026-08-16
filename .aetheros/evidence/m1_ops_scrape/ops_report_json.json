@@ -1,0 +1,11 @@
+{
+  "acceptance_id": "AC-M1-02",
+  "evidence_id": "ops_report_json",
+  "command": "cargo run -p aether-radio-cli -- ops-report --out data/reports/ops_report.json",
+  "path": "data/reports/ops_report.json",
+  "size_bytes": 1933,
+  "mtime_utc": "2026-08-16T06:57:28.2378420Z",
+  "cli_summary": "health=NORMAL packets=32",
+  "exit_code": 0,
+  "captured_at": "2026-08-16T06:57:28Z"
+}

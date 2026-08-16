@@ -1,0 +1,92 @@
+{
+  "profile_id": "soak-wall",
+  "passed": true,
+  "gates": [
+    {
+      "name": "min_packets",
+      "passed": true,
+      "detail": "512 >= 64"
+    },
+    {
+      "name": "max_sequence_gaps",
+      "passed": true,
+      "detail": "0 <= 0"
+    },
+    {
+      "name": "max_deadline_miss_ratio",
+      "passed": true,
+      "detail": "0.0000 <= 1"
+    },
+    {
+      "name": "rounds_completed",
+      "passed": true,
+      "detail": "4 == 4"
+    },
+    {
+      "name": "health_normal_each_round",
+      "passed": true,
+      "detail": "[\"NORMAL\", \"NORMAL\", \"NORMAL\", \"NORMAL\"]"
+    }
+  ],
+  "bench": {
+    "throughput": {
+      "gbps": 0.005779293060868979,
+      "gbs": 0.0007224116326086223,
+      "pps": 1410.9602199387155
+    },
+    "latency": {
+      "min_ns": 4040,
+      "p50_ns": 4040,
+      "p99_ns": 4040,
+      "p999_ns": 4040,
+      "max_ns": 4040
+    },
+    "radio": {
+      "slot_miss": 0,
+      "symbol_miss": 0
+    },
+    "packets": 512,
+    "bytes": 262144,
+    "sequence_gaps": 0,
+    "late_packets": 0,
+    "sim_duration_ns": 362873448,
+    "recovery_actions": 0,
+    "ring_occupancy_peak": 1
+  },
+  "fault_config": "configs/fault_injection.yaml",
+  "health": "NORMAL",
+  "recovery_actions": 0,
+  "rounds": 4,
+  "round_health": [
+    {
+      "round": 1,
+      "health": "NORMAL",
+      "packets": 128,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 2,
+      "health": "NORMAL",
+      "packets": 128,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 3,
+      "health": "NORMAL",
+      "packets": 128,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    },
+    {
+      "round": 4,
+      "health": "NORMAL",
+      "packets": 128,
+      "sequence_gaps": 0,
+      "recovery_actions": 0
+    }
+  ],
+  "elapsed_wall_ms": 15053,
+  "round_interval_ms": 5000
+}

@@ -1,0 +1,19 @@
+version: "1.0.0"
+id: soak-wall-long
+classification: project_specific
+description: >-
+  Minute-scale wall-clock soak evidence (not for default CI).
+  Target ~2 minutes of inter-round sleep plus bench work.
+bench_profile: configs/bench_profile.yaml
+fault_config: configs/fault_injection.yaml
+symbol_count_override: 64
+streams_override: 1
+report_path: data/reports/soak_wall_long.json
+events_path: data/reports/soak_wall_long_events.jsonl
+max_sequence_gaps: 0
+max_deadline_miss_ratio: 1.0
+min_packets: 64
+rounds: 7
+require_health_normal: true
+# 6 gaps × 20s = 120s wall sleep between rounds
+round_interval_ms: 20000

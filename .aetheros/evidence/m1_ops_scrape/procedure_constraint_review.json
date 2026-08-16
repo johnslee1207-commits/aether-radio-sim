@@ -1,0 +1,21 @@
+{
+  "acceptance_id": "AC-M1-06",
+  "evidence_id": "procedure_constraint_review",
+  "checked_at": "2026-08-16T06:57:30Z",
+  "constraints": {
+    "cuda_feature_used": false,
+    "dpdk_hardware_used": false,
+    "fpga_hardware_used": false,
+    "long_soak_run": false,
+    "business_code_modified": false,
+    "implementation_gate_entered": false
+  },
+  "commands_run": [
+    "cargo run -p aether-radio-cli -- prom-serve --once",
+    "Invoke-WebRequest http://127.0.0.1:9898/metrics",
+    "cargo run -p aether-radio-cli -- ops-report --out data/reports/ops_report.json",
+    "configs/ops/prometheus.yml review",
+    "Grafana datasource/dashboard path checks"
+  ],
+  "result": "PASS"
+}

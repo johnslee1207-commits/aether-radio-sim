@@ -1,0 +1,14 @@
+# Grafana dashboard provider for compose ops stack
+# classification: project_specific
+apiVersion: 1
+
+providers:
+  - name: Aether Radio
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/dashboards

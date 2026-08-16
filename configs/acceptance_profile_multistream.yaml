@@ -11,3 +11,5 @@ max_late_packets: 128
 max_symbol_miss: 128
 min_packets: 64
 report_path: data/reports/acceptance_multistream.json
+health_policy: configs/ops/health_policy.yaml
+require_health_normal: false

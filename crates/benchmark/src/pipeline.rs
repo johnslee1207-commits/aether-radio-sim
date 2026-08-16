@@ -207,7 +207,7 @@ impl PipelineBench {
         let mut ring_peak = 0u64;
         let mut injector = fault_injection::FaultInjector::new(fault.clone());
 
-        let process_one = |packet: Packet,
+        let mut process_one = |packet: Packet,
                            now_ns: &mut u64,
                            metrics: &mut MetricsEngine,
                            events: &mut EventLogger,

@@ -1,0 +1,73 @@
+schema_version: 1.0.0
+kind: C4ArchitectureView
+project_id: aether-radio-sim
+milestone_id: M1_ops_scrape_stack_evidence
+generated_at: "2026-08-16T06:51:30Z"
+status: draft_pending_user_confirmation
+authorization: architecture_planning_only
+
+context:
+  system: Aether Radio Sim ops evidence loop
+  users:
+    - R&D operator validating observability evidence under AetherOS
+  external_systems:
+    - Prometheus (scrape/store)
+    - Grafana (visualize)
+  goal: >-
+    Reproduce an evidence closed loop: sim metrics exporter → Prometheus → Grafana
+    → captured evidence artifacts, without hardware backends.
+
+containers:
+  - id: aether-radio-cli
+    technology: Rust binary aether-radio-sim
+    responsibility: prom-serve HTTP /metrics; optional prom-dump/ops-report
+    notes: Existing; sockets stay in CLI surface
+  - id: prometheus
+    technology: Prometheus server
+    responsibility: Scrape 9898/metrics; retain time series
+    config_authority: configs/ops/prometheus.yml
+  - id: grafana
+    technology: Grafana
+    responsibility: Datasource + overview dashboard for operator inspection
+    config_authority:
+      - data/ops/grafana/datasources/prometheus.yaml
+      - data/ops/dashboards/aether_radio_overview.json
+  - id: evidence-collector
+    technology: scripts + data/reports (runtime_generated)
+    responsibility: Capture scrape success, ops-report, dashboard smoke notes
+    notes: Planning only in this stage; no new business crate code
+
+components:
+  - container: aether-radio-cli
+    name: PromServe
+    inputs: configs/ops/prometheus_scrape.yaml + bench profile
+    outputs: text/plain Prometheus metrics on /metrics
+  - container: prometheus
+    name: ScrapeJob aether-sim
+    inputs: configs/ops/prometheus.yml
+    outputs: TSDB series for job aether-sim
+  - container: grafana
+    name: Datasource + Dashboard
+    inputs: provisioning YAML + dashboard JSON
+    outputs: operator-visible panels
+  - container: evidence-collector
+    name: EvidencePackager
+    inputs: ops-report JSON, scrape HTTP status, compose logs
+    outputs: .aetheros/evidence or data/reports bundle refs
+
+code_level_boundaries:
+  allowed_now:
+    - Planning artifacts under .aetheros/**
+    - Future data/config/compose under configs/, data/ops/, docker-compose*.yml (when implementation authorized)
+  forbidden_now:
+    - crates/** business logic changes
+    - implementation_gate entry
+  decoupling:
+    - Ports, scrape intervals, job names → local_machine_specific configs
+    - Dashboard layout → data/ops
+    - Gate thresholds / evidence schema → .aetheros plans + future acceptance contract
+
+missing_decisions:
+  - Confirm proposed Compose topology (host network vs bridge + published ports)
+  - Confirm evidence bundle schema filename/location
+  - Confirm whether prom-serve runs in Compose service or on host beside Compose

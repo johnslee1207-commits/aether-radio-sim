@@ -1,0 +1,55 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "EvidenceManifest",
+  "metadata": {
+    "id": "m1_ops_scrape_evidence_pack",
+    "project_id": "aether-radio-sim",
+    "milestone_id": "M1_ops_scrape_stack_evidence",
+    "generatedAt": "2026-08-16T06:57:30Z",
+    "scope": "host_local_existing_assets"
+  },
+  "plan_confirmation": ".aetheros/evidence/m1_plan_confirmation_2026-08-16.json",
+  "results": [
+    {
+      "acceptance_id": "AC-M1-01",
+      "status": "PASS",
+      "evidence": ".aetheros/evidence/m1_ops_scrape/metrics_http_proof.json",
+      "notes": "prom-serve --once + GET /metrics status 200 len=2526"
+    },
+    {
+      "acceptance_id": "AC-M1-02",
+      "status": "PASS",
+      "evidence": ".aetheros/evidence/m1_ops_scrape/ops_report_json.json",
+      "artifact": "data/reports/ops_report.json"
+    },
+    {
+      "acceptance_id": "AC-M1-03",
+      "status": "PASS",
+      "evidence": ".aetheros/evidence/m1_ops_scrape/prometheus_config_review.json"
+    },
+    {
+      "acceptance_id": "AC-M1-04",
+      "status": "PASS",
+      "evidence": ".aetheros/evidence/m1_ops_scrape/grafana_assets_review.json"
+    },
+    {
+      "acceptance_id": "AC-M1-05",
+      "status": "PASS",
+      "evidence": ".aetheros/evidence/m1_ops_scrape/evidence_manifest.json"
+    },
+    {
+      "acceptance_id": "AC-M1-06",
+      "status": "PASS",
+      "evidence": ".aetheros/evidence/m1_ops_scrape/procedure_constraint_review.json"
+    }
+  ],
+  "overall": "PASS_HOST_LOCAL",
+  "deferred": [
+    "docker-compose.ops.yml Prometheus+Grafana+prom-serve integrated stack (needs implementation authorization)"
+  ],
+  "gates": {
+    "completed_gate_ids_mutated": false,
+    "state_version_mutated": false,
+    "implementation_gate_entered": false
+  }
+}

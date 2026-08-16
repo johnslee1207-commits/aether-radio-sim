@@ -1,0 +1,91 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "M1EntrypointsInventory",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "milestone_id": "M1_ops_scrape_stack_evidence",
+    "generatedAt": "2026-08-16T06:52:30Z",
+    "read_only": true
+  },
+  "prom_serve": {
+    "package": "aether-radio-cli",
+    "binary": "aether-radio-sim",
+    "cli_command": "prom-serve",
+    "source": "crates/cli/src/main.rs",
+    "default_config": "configs/ops/prometheus_scrape.yaml",
+    "defaults": {
+      "bind": "127.0.0.1:9898",
+      "path": "/metrics",
+      "job": "aether-sim",
+      "bench_profile": "configs/bench_profile.yaml",
+      "refresh_on_scrape": true
+    },
+    "flags": {
+      "config": "--config configs/ops/prometheus_scrape.yaml",
+      "once": "--once"
+    },
+    "related_cli": [
+      {
+        "command": "prom-dump",
+        "default_out": "data/reports/metrics.prom",
+        "role": "offline Prometheus text dump"
+      },
+      {
+        "command": "ops-report",
+        "default_out": "data/reports/ops_report.json",
+        "role": "consolidated JSON evidence"
+      },
+      {
+        "command": "ops-status",
+        "default_config": "configs/ops/observability.yaml",
+        "role": "ops plane status print"
+      }
+    ]
+  },
+  "prometheus": {
+    "sample_config": "configs/ops/prometheus.yml",
+    "docs": ["configs/ops/README.md", "data/ops/grafana/README.md", "README.md"],
+    "scrape_job": "aether-sim",
+    "target": "127.0.0.1:9898",
+    "metrics_path": "/metrics",
+    "scrape_interval": "5s",
+    "operator_start_hint": "prometheus --config.file=configs/ops/prometheus.yml",
+    "compose_service": null
+  },
+  "grafana": {
+    "datasource_provisioning": "data/ops/grafana/datasources/prometheus.yaml",
+    "datasource_url": "http://127.0.0.1:9090",
+    "dashboard_json": "data/ops/dashboards/aether_radio_overview.json",
+    "docs": [
+      "data/ops/grafana/README.md",
+      "data/ops/dashboards/README.md"
+    ],
+    "compose_service": null
+  },
+  "compose": {
+    "ops_compose_file": null,
+    "existing_compose_files": [
+      {
+        "path": "docker-compose.split.yml",
+        "role": "FPGA UDP → host dataplane dual-container",
+        "ops_scrape": false
+      },
+      {
+        "path": "docker-compose.shm.yml",
+        "role": "SHM dual-process topology",
+        "ops_scrape": false
+      },
+      {
+        "path": "docker-compose.cuda.yml",
+        "role": "CUDA container path",
+        "ops_scrape": false
+      }
+    ],
+    "gap": "No Compose entrypoint for Prometheus/Grafana/prom-serve stack yet (implementation deferred)."
+  },
+  "coverage_pointer": {
+    "path": "data/architecture/observability_coverage_matrix.json",
+    "next_task_match": "Optional: Docker Compose stack with Prometheus+Grafana+prom-serve"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "ContextCompletenessReport",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "milestone_id": "M1_ops_scrape_stack_evidence",
+    "generatedAt": "2026-08-16T06:51:30Z",
+    "stage_skill": "aetheros-trusted-context",
+    "canonical_nodes": ["P3", "P4"]
+  },
+  "completeness": {
+    "status": "sufficient_for_architecture_planning",
+    "score_0_to_1": 0.82,
+    "blocking_gaps": [],
+    "non_blocking_gaps": [
+      "No docker-compose.ops.yml yet (expected future implementation artifact)",
+      "Cursor CLI/Cloud surfaces still disabled_until_smoke",
+      "Ops framework vs coverage matrix Trace wording drift",
+      ".aetheros authority files not committed to git"
+    ]
+  },
+  "required_sources_for_m1": [
+    {
+      "path": "configs/ops/prometheus_scrape.yaml",
+      "role": "prom-serve bind/path/job policy",
+      "classification": "local_machine_specific",
+      "present": true
+    },
+    {
+      "path": "configs/ops/prometheus.yml",
+      "role": "Prometheus scrape sample targeting 127.0.0.1:9898",
+      "classification": "local_machine_specific",
+      "present": true
+    },
+    {
+      "path": "data/ops/grafana/datasources/prometheus.yaml",
+      "role": "Grafana datasource provisioning sample → :9090",
+      "classification": "local_machine_specific",
+      "present": true
+    },
+    {
+      "path": "data/ops/dashboards/aether_radio_overview.json",
+      "role": "Grafana overview dashboard JSON",
+      "classification": "project_specific",
+      "present": true
+    },
+    {
+      "path": "data/ops/grafana/README.md",
+      "role": "Local stack operator notes",
+      "classification": "project_specific",
+      "present": true
+    },
+    {
+      "path": "crates/cli/src/main.rs",
+      "role": "prom-serve / prom-dump / ops-report entrypoints (read-only authority)",
+      "classification": "code_behavior",
+      "present": true
+    },
+    {
+      "path": "data/architecture/observability_coverage_matrix.json",
+      "role": "Coverage next_tasks includes Compose Prometheus+Grafana+prom-serve",
+      "classification": "platform_common",
+      "present": true
+    }
+  ],
+  "facts_extracted": [
+    "prom-serve binds 127.0.0.1:9898 /metrics by default",
+    "Prometheus sample scrapes aether-sim @ 9898",
+    "Grafana datasource sample points at Prometheus :9090",
+    "Dashboard JSON already exists; Compose ops stack does not",
+    "Existing compose files cover cuda/shm/split dataplane, not ops scrape"
+  ],
+  "authority_rules": [
+    "Do not treat README aspirational text as gate evidence",
+    "Ports/URLs are local_machine_specific and must stay in configs/data",
+    "M1 must not require CUDA/DPDK/FPGA"
+  ]
+}

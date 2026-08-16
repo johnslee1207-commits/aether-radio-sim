@@ -1,0 +1,9 @@
+{
+  "rounds": 4,
+  "elapsed_wall_ms": 15053,
+  "checked_at": "2026-08-16T07:16:33.4787359Z",
+  "round_interval_ms": 5000,
+  "passed": true,
+  "profile_id": "soak-wall",
+  "health": "NORMAL"
+}

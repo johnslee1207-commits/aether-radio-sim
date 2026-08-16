@@ -1,0 +1,13 @@
+# Grafana provisioning — Prometheus datasource inside docker-compose.ops.yml
+# classification: local_machine_specific (service DNS)
+apiVersion: 1
+
+datasources:
+  - name: Aether Radio Sim
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: 5s

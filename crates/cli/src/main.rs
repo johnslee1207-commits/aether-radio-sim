@@ -917,7 +917,10 @@ fn run_host_recv(
     use aether_types::StreamId;
     use cx5_emulator::{Cx5Nic, PacketIO};
     use gpu_runtime::GpuRingBuffer;
-    use metrics_engine::{EventLogger, LogEvent, MetricsEngine};
+    use metrics_engine::{
+        taxonomy, EventLogger, LogEvent, MetricsBackend, MetricsEngine, ObservabilityConfig,
+        RecoveryExecutor, RecoveryPolicy,
+    };
     use std::thread;
     use std::time::{Duration, Instant};
 
@@ -944,16 +947,26 @@ fn run_host_recv(
             .with_context(|| format!("read {}", gpu_ring_path.display()))?,
     )?;
     let mut metrics = MetricsEngine::new();
-    let ops = metrics_engine::ObservabilityConfig::load_path("configs/ops/observability.yaml").ok();
+    metrics.set_link_up(true, 100.0);
+    metrics.set_memory_buffers(0, (ring.slot_count() * ring.slot_bytes()) as u64);
+    let ops = ObservabilityConfig::load_path("configs/ops/observability.yaml").ok();
     let events_path = ops
         .as_ref()
         .map(|o| o.logging.events_path.clone())
         .unwrap_or_else(|| "data/reports/host_recv_events.jsonl".into());
     let mut events = EventLogger::create(&events_path)?;
+    let mut recovery = ops
+        .as_ref()
+        .and_then(|o| RecoveryPolicy::load_path(&o.recovery.policy_path).ok())
+        .map(RecoveryExecutor::new);
     let _ = events.emit(
-        &LogEvent::now(metrics_engine::taxonomy::RUNTIME_STARTED)
+        &LogEvent::now(taxonomy::RUNTIME_STARTED)
             .with_component("host-recv")
-            .with_detail(transport.to_string()),
+            .with_detail(format!(
+                "{} recovery={}",
+                transport,
+                recovery.as_ref().map(|r| r.policy_id()).unwrap_or("none")
+            )),
     );
 
     #[cfg(feature = "cuda")]
@@ -1020,15 +1033,32 @@ fn run_host_recv(
             match transport_eng.ingest(pkt.clone()) {
                 Ok(()) => {}
                 Err(aether_transport::TransportError::SequenceGap { got, .. }) => {
+                    if let Some(ex) = recovery.as_mut() {
+                        let _ = ex.apply("sequence_gap", Some(&mut events));
+                    }
                     transport_eng.recover_sequence(sid, got);
                     metrics.record_sequence_gap();
+                    let _ = events.emit(
+                        &LogEvent::now(taxonomy::SEQUENCE_GAP)
+                            .with_component("host-recv")
+                            .with_stream(stream_id)
+                            .with_sequence(got),
+                    );
                     if transport_eng.ingest(pkt.clone()).is_err() {
                         continue;
                     }
                 }
                 Err(aether_transport::TransportError::LatePacket { .. }) => {
+                    if let Some(ex) = recovery.as_mut() {
+                        let _ = ex.apply("late_packet", Some(&mut events));
+                    }
                     metrics.record_deadline_miss();
                     metrics.record_late_packet();
+                    let _ = events.emit(
+                        &LogEvent::now(taxonomy::LATE_PACKET)
+                            .with_component("host-recv")
+                            .with_stream(stream_id),
+                    );
                     continue;
                 }
                 Err(_) => continue,
@@ -1040,23 +1070,57 @@ fn run_host_recv(
                 cx5.advance_time(now);
                 for delivered in cx5.rx_burst(32) {
                     metrics.record_rx();
+                    metrics.record_rx_bytes(delivered.payload.len() as u64);
                     #[cfg(feature = "cuda")]
                     if let Some(gpu) = cuda_gpu.as_mut() {
                         let _ = gpu.process_bytes(&delivered.payload)?;
                         now = now.saturating_add(gpu.last_kernel_ns.unwrap_or(0));
                     } else {
-                        let lat = ring.process_packet(&delivered.payload, now)?;
-                        now = now.saturating_add(lat);
+                        match ring.begin_receive(now) {
+                            Ok(idx) => {
+                                metrics.set_ring_occupancy(ring.occupied() as u64);
+                                ring.complete_receive(idx, &delivered.payload)?;
+                                let (idx, done_at) = ring.begin_process(now)?;
+                                let lat = ring.complete_process(idx, done_at)?;
+                                ring.release(idx)?;
+                                metrics.record_kernel_ns(lat);
+                                now = now.saturating_add(lat);
+                            }
+                            Err(gpu_runtime::GpuError::RingFull) => {
+                                metrics.record_buffer_full();
+                                if let Some(ex) = recovery.as_mut() {
+                                    let _ = ex.apply("buffer_overflow", Some(&mut events));
+                                }
+                            }
+                            Err(e) => return Err(e.into()),
+                        }
                     }
                     #[cfg(not(feature = "cuda"))]
                     {
                         let _ = cuda_gpu;
-                        let lat = ring.process_packet(&delivered.payload, now)?;
-                        now = now.saturating_add(lat);
+                        match ring.begin_receive(now) {
+                            Ok(idx) => {
+                                metrics.set_ring_occupancy(ring.occupied() as u64);
+                                ring.complete_receive(idx, &delivered.payload)?;
+                                let (idx, done_at) = ring.begin_process(now)?;
+                                let lat = ring.complete_process(idx, done_at)?;
+                                ring.release(idx)?;
+                                metrics.record_kernel_ns(lat);
+                                now = now.saturating_add(lat);
+                            }
+                            Err(gpu_runtime::GpuError::RingFull) => {
+                                metrics.record_buffer_full();
+                                if let Some(ex) = recovery.as_mut() {
+                                    let _ = ex.apply("buffer_overflow", Some(&mut events));
+                                }
+                            }
+                            Err(e) => return Err(e.into()),
+                        }
                     }
                     let e2e = now.saturating_sub(delivered.timestamp.0);
+                    metrics.record_latency_sample(e2e);
                     let _ = events.emit(
-                        &LogEvent::now(metrics_engine::taxonomy::PACKET_RX)
+                        &LogEvent::now(taxonomy::PACKET_RX)
                             .with_component("host-recv")
                             .with_stream(delivered.stream_id.0)
                             .with_sequence(delivered.sequence.0)

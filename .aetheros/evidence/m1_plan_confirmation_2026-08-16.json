@@ -1,0 +1,26 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "PendingDecisionConfirmation",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T06:56:00Z",
+    "source": "user_message"
+  },
+  "decision_id": "confirm_m1_architecture_and_verification_plans",
+  "choice": "confirmed_to_close_planning_and_run_minimal_verify",
+  "user_intent": "尽快完成上面的任务，继续开发下一个需求",
+  "confirmed_artifacts": [
+    ".aetheros/plans/m1-ops-scrape-stack/m1_context_manifest.json",
+    ".aetheros/plans/m1-ops-scrape-stack/acceptance_criteria.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/entrypoints_inventory.json",
+    ".aetheros/plans/m1-ops-scrape-stack/evidence_plan.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/verification_command_candidates.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/adr_m1_001_ops_scrape_stack.md"
+  ],
+  "verify_scope": {
+    "run": ["VC-01", "VC-03", "VC-05", "VC-06"],
+    "exclude": ["long_soak", "cuda", "implementation_gate", "docker-compose.ops.yml"]
+  },
+  "notes": "Closes M1 planning acceptance on host-local existing assets. Compose ops stack remains a follow-on implementation item, not blocking this closeout."
+}

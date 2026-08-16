@@ -1,0 +1,169 @@
+schema_version: 1.0.0
+kind: UserGoalBacklog
+project_id: aether-radio-sim
+generated_at: "2026-08-16T11:23:00Z"
+status: proposed_pending_user_selection
+basis:
+  completed:
+    - M1 host-local ops evidence
+    - docker-compose.ops.yml Prometheus+Grafana (+ host prom-serve)
+    - soak_profile_wall (~15s wall evidence)
+    - CUDA WSL2 gpu-info + smoke-cuda
+  product_maturity: "Sprints 1–6 + O001–O025 done; ops score ~4.5"
+  intent: "AetherOS-governed radio/comms simulation R&D"
+
+recommended_sequence:
+  - id: G0
+    priority: P0
+    title: 治理收口 — 提交权威产物并固定可复现基线
+    job_to_be_done:
+      user_role: R&D operator / maintainer
+      situation: ".aetheros 与 ops compose 改动多为未提交工作树"
+      motivation: "后续任务需要可复现基线与证据引用"
+      expected_progress: "一次清晰 commit（或分拆 PR）+ README/证据路径稳定"
+      success_criteria:
+        - "关键 .aetheros/plans、compose、configs、cuda fix 已纳入版本控制（按用户确认）"
+        - "req_123 evidence 路径可被后人复跑"
+    effort: S
+    depends_on: []
+    authorizes: [docs_config_aetheros_commit]
+    blocks_implementation: false
+
+  - id: G1
+    priority: P0
+    title: Compose full-profile 证据 — 容器内 prom-serve 闭环
+    job_to_be_done:
+      user_role: ops developer
+      situation: "当前默认是 host prom-serve；--profile full 尚未证据化"
+      motivation: "一键 Compose 不依赖宿主机 cargo 进程"
+      expected_progress: "full profile 可 up；Prometheus 刮到 prom-serve:9898；证据包落盘"
+      success_criteria:
+        - "docker compose -f docker-compose.ops.yml --profile full 可运行"
+        - "使用 prometheus_compose_full.yml；target UP"
+        - ".dockerignore 生效，构建上下文可控"
+    effort: M
+    depends_on: [G0]
+    authorizes: [compose_dockerfile_config]
+    notes: "优先于硬件适配；纯集成"
+
+  - id: G2
+    priority: P1
+    title: 分钟级 wall-clock soak 配置与 CI 分离
+    job_to_be_done:
+      user_role: reliability engineer
+      situation: "soak_profile_wall 仅约 15s；覆盖矩阵仍列 minutes+"
+      motivation: "证明长时间健康轮询与门禁"
+      expected_progress: "soak_profile_wall_long.yaml（如 2–5 分钟）+ 独立证据，不进入默认 CI"
+      success_criteria:
+        - "elapsed_wall_ms 达到约定阈值阈值"
+        - "每轮 health NORMAL（或显式允许策略）"
+        - "CI 仍只用 soak_profile_ci"
+    effort: S
+    depends_on: []
+    authorizes: [configs_evidence_only]
+
+  - id: G3
+    priority: P1
+    title: CUDA 证据加深 — bench_cuda + 可选 PTX 再生说明
+    job_to_be_done:
+      user_role: GPU dataplane developer
+      situation: "已有 smoke-cuda；尚缺 PipelineBench CUDA 证据包"
+      motivation: "把可选 CUDA 路径做成可回归证据"
+      expected_progress: "wsl_bench_cuda / bench --profile bench_profile_cuda 的证据清单"
+      success_criteria:
+        - "bench JSON + 简短 summary 在 .aetheros/evidence/cuda_wsl/"
+        - "仍不把 CUDA 设为默认 CI gate"
+    effort: S
+    depends_on: []
+    authorizes: [scripts_evidence_cuda]
+
+  - id: G4
+    priority: P1
+    title: AetherOS 能力面升级 — CLI/Cloud smoke 与 autonomy
+    job_to_be_done:
+      user_role: AetherOS operator
+      situation: "capability-profile 中 CLI/Cloud disabled_until_smoke；L1"
+      motivation: "降低纯 IDE 会话依赖"
+      expected_progress: "定义 smoke 清单；通过后更新 capability-profile"
+      success_criteria:
+        - "documented smoke 通过"
+        - "cursor_cli 或 cloud 标记从 disabled_until_smoke 提升"
+    effort: M
+    depends_on: [G0]
+    authorizes: [aetheros_capability_docs]
+
+  - id: G5
+    priority: P2
+    title: 文档漂移清理 — Ops Framework Trace 表述对齐矩阵
+    job_to_be_done:
+      user_role: maintainer
+      situation: "框架文档与 coverage matrix / AGENTS 对 Trace 完成度表述可能不一致"
+      motivation: "避免后续审计把文档当成缺口"
+      expected_progress: "docs 与 matrix 对齐；一次证据备注"
+      success_criteria:
+        - "无互相矛盾的 Trace/Health 完成声明"
+    effort: S
+    depends_on: []
+    authorizes: [docs_only]
+
+  - id: G6
+    priority: P2
+    title: 双进程/Compose 回归证据包（UDP + SHM）
+    job_to_be_done:
+      user_role: integration tester
+      situation: "split/shm compose 与 scripts 已有，缺统一证据包"
+      motivation: "保护 FPGA↔host 拓扑不回退"
+      expected_progress: "scripts + 短证据清单（非长 soak）"
+      success_criteria:
+        - "dual_process 或 docker-compose.split/shm 至少一条可复现 PASS 记录"
+    effort: M
+    depends_on: [G0]
+    authorizes: [scripts_compose_evidence]
+
+  - id: G7
+    priority: P3
+    title: DPDK/DOCA mock→hardware 适配器尖兵（高风险）
+    job_to_be_done:
+      user_role: NIC dataplane developer
+      situation: "dpdk.yaml hardware 明示不可用；仅有 mock"
+      motivation: "接近真实 100G/CX5 路径"
+      expected_progress: "接口契约 + mock 扩展或 adapter crate 尖兵；不绑定业务热路径 sockets"
+      success_criteria:
+        - "adapter 边界清晰；硬件路径可开关且默认关闭"
+        - "无密钥/绝对路径硬编码"
+    effort: L
+    depends_on: [G0, G1]
+    authorizes: [architecture_then_impl]
+    risk: high
+
+  - id: G8
+    priority: P3
+    title: 真实 FPGA / 比特流联调尖兵（最高风险）
+    job_to_be_done:
+      user_role: radio hardware engineer
+      situation: "当前为软件 FPGA emulator"
+      motivation: "从仿真走向半实物"
+      expected_progress: "仅在有硬件授权与环境后启动；先出接口/验收合同"
+      success_criteria:
+        - "验收合同与安全边界先于代码"
+    effort: XL
+    depends_on: [G7]
+    authorizes: [hardware_governance_required]
+    risk: critical
+
+suggested_next_batch:
+  description: "建议下一轮用户一次选 2–3 项顺序执行"
+  default_pick:
+    - G0
+    - G1
+    - G2
+  alternate_pick_gpu_focus:
+    - G0
+    - G3
+    - G5
+  alternate_pick_platform_focus:
+    - G0
+    - G4
+    - G6
+
+pending_decision_id: select_next_user_goal_batch

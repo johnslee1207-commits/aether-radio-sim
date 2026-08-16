@@ -1,0 +1,230 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "IntakeMorphologyReport",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T06:43:54Z",
+    "generatedBy": "cursor-aetheros-intake",
+    "stage": "INTAKE",
+    "business_code_modified": false
+  },
+  "intent_summary": {
+    "goal": "将该项目接入 AetherOS 自主研发模式，用于后续无线电/通信仿真相关研发",
+    "intake_scope_only": [
+      "project_structure",
+      "tech_stack_and_entrypoints",
+      "core_simulation_capabilities",
+      "risks_and_gaps",
+      "first_rd_milestone_recommendation",
+      "intent_contract_and_trusted_context_drafts"
+    ],
+    "forbidden_in_this_stage": [
+      "business_code_edits",
+      "architecture_gate",
+      "implementation_gate"
+    ]
+  },
+  "project_structure": {
+    "top_level": [
+      "Cargo.toml",
+      "crates/",
+      "configs/",
+      "data/",
+      "docs/",
+      "scripts/",
+      "tests/",
+      ".github/",
+      ".aetheros/",
+      ".cursor/",
+      "docker-compose*.yml",
+      "AGENTS.md",
+      "README.md"
+    ],
+    "workspace_crates": [
+      "aether-types",
+      "aether-protocol",
+      "aether-transport",
+      "fpga-emulator",
+      "ethernet-model",
+      "cx5-emulator",
+      "memory-manager",
+      "gpu-runtime",
+      "gpu-cuda",
+      "net-io",
+      "shm-io",
+      "metrics-engine",
+      "fault-injection",
+      "benchmark",
+      "cli"
+    ],
+    "data_authority_paths": [
+      "configs/",
+      "configs/ops/",
+      "configs/backends/",
+      "data/architecture/",
+      "data/ops/",
+      "data/profiles/"
+    ]
+  },
+  "tech_stack": {
+    "language": "Rust 2021 (1.75+)",
+    "workspace_version": "0.1.1",
+    "control_plane": "tokio (CLI/scheduling)",
+    "data_plane": "sync/poll/lock-free oriented; no async on hot path",
+    "default_build": "simulation-only",
+    "optional_features": ["cuda"],
+    "io_backends": ["simulation", "udp(net-io)", "shm(shm-io)"],
+    "hardware_binding_policy": "Do not bind DPDK/CUDA/Linux sockets in business crates; adapters/config-driven"
+  },
+  "runtime_entrypoints": {
+    "package": "aether-radio-cli",
+    "binary": "aether-radio-sim",
+    "invoke": "cargo run -p aether-radio-cli -- <cmd>",
+    "commands": [
+      "info",
+      "validate-config",
+      "smoke",
+      "bench",
+      "accept",
+      "ops-status",
+      "soak",
+      "prom-dump",
+      "ops-report",
+      "prom-serve",
+      "fault-drill",
+      "gpu-info",
+      "smoke-cuda",
+      "fpga-emit",
+      "host-recv",
+      "shm-prepare"
+    ],
+    "sources": [
+      "crates/cli/src/main.rs",
+      "README.md",
+      "AGENTS.md"
+    ]
+  },
+  "core_simulation_capabilities": {
+    "pipeline": "FPGA Radio Emulator → Aether Transport → CX5/DPDK model → Host/GPU memory → GPU PHY",
+    "capabilities": [
+      {
+        "id": "iq_radio_packetize",
+        "crate": "crates/fpga-emulator",
+        "config": "configs/radio_timing.yaml"
+      },
+      {
+        "id": "ecpri_like_protocol",
+        "crate": "crates/aether-protocol",
+        "config": null
+      },
+      {
+        "id": "stream_sequence_timestamp",
+        "crate": "crates/aether-transport",
+        "config": "configs/transport_deadline*.yaml"
+      },
+      {
+        "id": "ethernet_100g_model",
+        "crate": "crates/ethernet-model",
+        "config": "configs/ethernet_model.yaml"
+      },
+      {
+        "id": "cx5_dma_dpdk_mock",
+        "crate": "crates/cx5-emulator",
+        "config": ["configs/nic_dma.yaml", "configs/backends/dpdk.yaml"]
+      },
+      {
+        "id": "host_gpu_memory",
+        "crate": "crates/memory-manager",
+        "config": "configs/memory_pool.yaml"
+      },
+      {
+        "id": "gpu_ring_sim_or_cuda",
+        "crate": ["crates/gpu-runtime", "crates/gpu-cuda"],
+        "config": ["configs/gpu_ring.yaml", "configs/backends/gpu_cuda.yaml"]
+      },
+      {
+        "id": "cross_process_io",
+        "crate": ["crates/net-io", "crates/shm-io"],
+        "config": "configs/backends/net_link*.yaml|shm_link*.yaml"
+      },
+      {
+        "id": "fault_injection",
+        "crate": "crates/fault-injection",
+        "config": "configs/fault_injection*.yaml"
+      },
+      {
+        "id": "bench_accept_soak",
+        "crate": "crates/benchmark",
+        "config": ["configs/bench_*", "configs/acceptance_*", "configs/soak_*"]
+      },
+      {
+        "id": "observability_ops",
+        "crate": "crates/metrics-engine",
+        "config": "configs/ops/*",
+        "coverage": "data/architecture/observability_coverage_matrix.json",
+        "ops_score_0_to_5": 4.5,
+        "sprint_o": "O001-O025 complete"
+      }
+    ]
+  },
+  "risks_and_gaps": [
+    {
+      "id": "no_real_fpga_cx5_dpdk",
+      "severity": "high",
+      "summary": "Real FPGA/CX5/DPDK hardware adapters absent; DPDK hardware backend unavailable by design until adapter exists"
+    },
+    {
+      "id": "cuda_optional_env_fragile",
+      "severity": "medium",
+      "summary": "CUDA path needs WSL2 + LD_LIBRARY_PATH / toolkit alignment; not default CI"
+    },
+    {
+      "id": "ops_compose_stack_optional",
+      "severity": "medium",
+      "summary": "Coverage next_tasks still list Compose Prometheus+Grafana+prom-serve as optional"
+    },
+    {
+      "id": "doc_drift_trace_status",
+      "severity": "low",
+      "summary": "Ops framework text may lag TraceEngine completion claimed by matrix/AGENTS"
+    },
+    {
+      "id": "aetheros_onboarding_incomplete",
+      "severity": "high",
+      "summary": "Stage INTAKE; gates empty; autonomy L1; CLI/cloud surfaces disabled_until_smoke; .aetheros mostly untracked"
+    },
+    {
+      "id": "special_hardware_unknown",
+      "severity": "medium",
+      "summary": "capability-profile.requires_special_hardware still unknown"
+    }
+  ],
+  "recommended_first_rd_milestone": {
+    "id": "M1_ops_scrape_stack_evidence",
+    "title": "Governed ops scrape stack evidence pack",
+    "rationale": "Matches coverage next_tasks; no DPDK/FPGA hardware; measurable AetherOS loop after INTAKE",
+    "candidate_deliverables": [
+      "Docker Compose path: prom-serve + Prometheus + Grafana against existing metrics",
+      "Reproducible evidence: ops-report / scrape / dashboard smoke",
+      "Bind evidence to next gate request (not self-approved)"
+    ],
+    "status": "pending_user_confirmation",
+    "alternatives": [
+      "M1-alt: longer wall-clock soak profiles",
+      "M1-alt: CUDA evidence pack on authorized WSL2 host",
+      "M1-alt: DPDK/DOCA adapter spike (higher risk, later)"
+    ]
+  },
+  "sources": [
+    "README.md",
+    "AGENTS.md",
+    "Cargo.toml",
+    "crates/cli/src/main.rs",
+    "docs/CURSOR_DEVELOPMENT_SPEC_v1.1.md",
+    "docs/AETHER_RADIO_OBSERVABILITY_OPS_FRAMEWORK_v1.0.md",
+    "data/architecture/observability_coverage_matrix.json",
+    ".aetheros/project-state.json",
+    ".aetheros/evidence/bootstrap_report.json"
+  ]
+}

@@ -1,0 +1,71 @@
+schema_version: 1.0.0
+kind: M1AcceptanceCriteria
+project_id: aether-radio-sim
+milestone_id: M1_ops_scrape_stack_evidence
+generated_at: "2026-08-16T06:52:30Z"
+status: draft_pending_confirmation
+implementation_authorized: false
+
+goal: >-
+  Demonstrate a reproducible ops evidence closed loop using existing
+  prom-serve / Prometheus / Grafana assets (Compose may be added later
+  under separate implementation authorization).
+
+acceptance_criteria:
+  - id: AC-M1-01
+    title: Metrics exporter reachable
+    must: |
+      `prom-serve --once` (or equivalent single-request scrape path) returns HTTP 200
+      for GET /metrics with Prometheus text body.
+    evidence: metrics_http_proof
+    blocking: true
+
+  - id: AC-M1-02
+    title: Ops report artifact produced
+    must: |
+      `ops-report` writes a JSON report under data/reports/ (or configured out path)
+      containing bench/health/layered metrics fields usable as evidence.
+    evidence: ops_report_json
+    blocking: true
+
+  - id: AC-M1-03
+    title: Prometheus scrape config validity
+    must: |
+      configs/ops/prometheus.yml is present and targets job aether-sim at the
+      configured exporter endpoint (default 127.0.0.1:9898 /metrics).
+    evidence: prometheus_config_review
+    blocking: true
+
+  - id: AC-M1-04
+    title: Grafana assets present and wired
+    must: |
+      Datasource sample (→ Prometheus :9090) and overview dashboard JSON exist and
+      are referenced by an operator procedure.
+    evidence: grafana_assets_review
+    blocking: true
+
+  - id: AC-M1-05
+    title: Evidence pack completeness
+    must: |
+      A governed evidence manifest lists AC-M1-01..04 proofs with paths, timestamps,
+      and command invocations; no CUDA/DPDK/FPGA dependency in the procedure.
+    evidence: evidence_bundle_manifest
+    blocking: true
+
+  - id: AC-M1-06
+    title: Hardware non-dependency
+    must: |
+      Verification procedure uses default simulation/ops path only; no --features cuda,
+      no DPDK hardware backend, no FPGA hardware requirement.
+    evidence: procedure_constraint_review
+    blocking: true
+
+deferred_not_required_for_m1_pass:
+  - Full Docker Compose ops stack up/healthy (implementation not authorized yet)
+  - Long wall-clock soak profiles
+  - Live Grafana UI screenshot (optional nicety; API/CLI proofs preferred)
+
+fail_conditions:
+  - Business crates modified to “make evidence pass”
+  - Soak minutes-long run used as substitute for scrape loop proof
+  - Implementation gate entered without explicit authorization

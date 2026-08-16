@@ -32,13 +32,17 @@
       "path_globs": [
         "configs/backends/**",
         "configs/transport_deadline_net.yaml",
+        "docker-compose.ops.yml",
+        "docker-compose.ops.full.yml",
         "docker-compose.split.yml",
         "docker-compose.shm.yml",
         "docker-compose.cuda.yml",
         "Dockerfile.fpga",
         "Dockerfile.host",
         "Dockerfile.cuda",
-        "data/ops/dashboards/**"
+        ".dockerignore",
+        "data/ops/dashboards/**",
+        "data/ops/grafana/**"
       ]
     },
     "runtime_generated": {

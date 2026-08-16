@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "aetheros-governance": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "D:\\Projects\\aetheros\\aetheros-autonomous-rd\\mcp\\governance-server\\service.py"
+      ]
+    },
+    "aetheros-evidence": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "D:\\Projects\\aetheros\\aetheros-autonomous-rd\\mcp\\evidence-server\\service.py"
+      ]
+    },
+    "aetheros-mock-harness": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "D:\\Projects\\aetheros\\aetheros-autonomous-rd\\mcp\\mock-harness-adapter\\service.py"
+      ]
+    }
+  }
+}

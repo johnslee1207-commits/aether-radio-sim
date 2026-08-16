@@ -1,0 +1,7 @@
+schema_version: 1.0.0
+max_wall_time_seconds: 7200
+max_model_tokens: 500000
+max_tool_calls: 500
+max_retries_per_task: 3
+max_parallel_agents: 4
+max_external_cost_usd: 20

@@ -1,0 +1,88 @@
+# Ops scrape stack: Prometheus + Grafana (+ optional in-compose prom-serve)
+#
+# Default (fast — recommended for evidence):
+#   Terminal A:
+#     cargo run -p aether-radio-cli -- prom-serve --config configs/ops/prometheus_scrape_compose.yaml
+#   Terminal B:
+#     docker compose -f docker-compose.ops.yml up -d
+#   Then:
+#     curl http://127.0.0.1:9898/metrics
+#     curl http://127.0.0.1:9090/api/v1/targets
+#     open http://127.0.0.1:3000  (admin/admin)
+#
+# Full profile (builds Dockerfile.host; slower first time):
+#   docker compose -f docker-compose.ops.yml -f docker-compose.ops.full.yml --profile full up --build -d
+#
+# Tear down:
+#   docker compose -f docker-compose.ops.yml -f docker-compose.ops.full.yml --profile full down
+#   # or without full override:
+#   docker compose -f docker-compose.ops.yml down
+#
+# classification: external_integration_specific
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: aether-ops-prometheus
+    networks:
+      - aether-ops
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./configs/ops/prometheus_compose.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+
+  grafana:
+    image: grafana/grafana:11.1.4
+    container_name: aether-ops-grafana
+    networks:
+      - aether-ops
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./data/ops/grafana/datasources/prometheus_compose.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ./data/ops/grafana/dashboards_provider.yaml:/etc/grafana/provisioning/dashboards/provider.yaml:ro
+      - ./data/ops/dashboards:/etc/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+
+  # Optional: in-compose exporter (requires image build).
+  prom-serve:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: Dockerfile.host
+    container_name: aether-ops-prom-serve
+    networks:
+      - aether-ops
+    ports:
+      - "9898:9898"
+    volumes:
+      - ./configs:/workspace/configs:ro
+      - ./data/reports:/workspace/data/reports
+    working_dir: /workspace
+    environment:
+      - RUST_LOG=info
+    command:
+      - /workspace/target/release/aether-radio-sim
+      - prom-serve
+      - --config
+      - configs/ops/prometheus_scrape_compose.yaml
+
+networks:
+  aether-ops:
+    driver: bridge
+
+volumes:
+  grafana-data:

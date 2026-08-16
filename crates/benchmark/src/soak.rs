@@ -32,6 +32,9 @@ pub struct SoakProfile {
     /// When true, every round must end in NORMAL health.
     #[serde(default)]
     pub require_health_normal: bool,
+    /// Wall-clock sleep between rounds (ms). 0 = no sleep (sim-time only).
+    #[serde(default)]
+    pub round_interval_ms: u64,
 }
 
 fn default_health_policy() -> String {
@@ -85,6 +88,10 @@ pub struct SoakReport {
     pub rounds: u32,
     #[serde(default)]
     pub round_health: Vec<SoakRoundHealth>,
+    #[serde(default)]
+    pub elapsed_wall_ms: u64,
+    #[serde(default)]
+    pub round_interval_ms: u64,
 }
 
 #[derive(Debug, Error)]
@@ -127,8 +134,12 @@ impl SoakRunner {
         let mut aggregate = BenchReport::default();
         let mut round_health = Vec::with_capacity(rounds as usize);
         let mut last_health = HealthState::Normal;
+        let wall_start = std::time::Instant::now();
 
         for r in 1..=rounds {
+            if r > 1 && p.round_interval_ms > 0 {
+                std::thread::sleep(std::time::Duration::from_millis(p.round_interval_ms));
+            }
             let bench_path = self.base_dir.join(&p.bench_profile);
             let mut bench_profile = BenchProfile::load_path(&bench_path)?;
             if let Some(n) = p.symbol_count_override {
@@ -244,6 +255,7 @@ impl SoakRunner {
 
         let passed = gates.iter().all(|g| g.passed);
         let recovery_actions = aggregate.recovery_actions;
+        let elapsed_wall_ms = wall_start.elapsed().as_millis() as u64;
 
         let report = SoakReport {
             profile_id: p.id.clone(),
@@ -255,6 +267,8 @@ impl SoakRunner {
             recovery_actions,
             rounds,
             round_health,
+            elapsed_wall_ms,
+            round_interval_ms: p.round_interval_ms,
         };
 
         if let Some(parent) = Path::new(&p.report_path).parent() {
@@ -301,5 +315,6 @@ mod tests {
         assert_eq!(report.rounds, 2);
         assert_eq!(report.round_health.len(), 2);
         assert!(report.health.is_some());
+        assert!(report.elapsed_wall_ms > 0 || report.round_interval_ms == 0);
     }
 }

@@ -1,0 +1,16 @@
+# Reduce Docker build context (target/ and reports dominate on Windows).
+.git
+.github
+.gitnexus
+.aetheros
+.claude
+.cursor
+.agents
+target
+data/reports
+**/*.md
+!README.md
+*.pdb
+*.ilk
+agent-transcripts
+node_modules

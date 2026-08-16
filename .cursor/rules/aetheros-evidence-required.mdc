@@ -1,0 +1,9 @@
+---
+description: Deterministic evidence is required before completion claims.
+alwaysApply: false
+---
+
+- Completion requires deterministic evidence: command exit codes, tests, benchmarks, artifact hashes, or governance decisions.
+- "Should pass", "appears complete", and hidden reasoning are not evidence.
+- Preserve raw command status, test status, commit or working tree identity, and artifact hash.
+- Mark unsupported or missing verification as `NOT_IMPLEMENTED` or `UNVERIFIED`, never as passed.

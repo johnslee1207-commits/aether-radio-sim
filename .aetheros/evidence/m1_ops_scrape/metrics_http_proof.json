@@ -1,0 +1,9 @@
+{
+  "acceptance_id": "AC-M1-01",
+  "evidence_id": "metrics_http_proof",
+  "url": "http://127.0.0.1:9898/metrics",
+  "status_code": 200,
+  "content_length": 2526,
+  "snippet": "# HELP aether_link_up Physical link up (1) or down (0)\n# TYPE aether_link_up gauge\naether_link_up{job=\"aether-sim\"} 1\n# HELP aether_link_speed_gbps Configured or modelled link speed\n# TYPE aether_link_speed_gbps gauge\naether_link_speed_gbps{job=\"aether-sim\"} 100\n# HELP aether_transport_rx_packets Transport RX packets\n# TYPE aether_transport_rx_packets counter\naether_transport_rx_packets{job=\"aethe",
+  "scraped_at": "2026-08-16T06:57:19.3393013Z"
+}

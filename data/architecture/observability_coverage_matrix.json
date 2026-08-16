@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "id": "aether-radio-observability-coverage",
   "classification": "platform_common",
   "framework": "docs/AETHER_RADIO_OBSERVABILITY_OPS_FRAMEWORK_v1.0.md",
@@ -7,7 +7,8 @@
   "sprint_o": {
     "completed": [
       "O001", "O002", "O003", "O004", "O005", "O006", "O007", "O008", "O009", "O010",
-      "O011", "O012", "O013", "O014", "O015", "O016", "O017", "O018", "O019", "O020"
+      "O011", "O012", "O013", "O014", "O015", "O016", "O017", "O018", "O019", "O020",
+      "O021", "O022", "O023", "O024", "O025"
     ],
     "remaining": []
   },
@@ -20,21 +21,26 @@
     "5": "production-ops ready"
   },
   "pillars": [
-    { "id": "metrics", "score": 4, "notes": "5-layer + Prometheus text + HTTP scrape + ops-report" },
-    { "id": "logging_events", "score": 4, "notes": "taxonomy + JSONL on smoke/bench/host-recv/soak/drill" },
+    { "id": "metrics", "score": 4, "notes": "5-layer + Prometheus + ops-report; host-recv ring occupancy" },
+    { "id": "logging_events", "score": 4, "notes": "taxonomy + JSONL including host-recv gap/late" },
     { "id": "trace", "score": 4, "notes": "TraceEngine default-on; PipelineBench + smoke stamps" },
-    { "id": "health", "score": 4, "notes": "HealthManager per soak round + smoke/prom/drill" },
-    { "id": "recovery", "score": 4, "notes": "RecoveryPolicy executor + smoke/fault-drill" },
-    { "id": "config_management", "score": 4, "notes": "configs/ops + prometheus.yml sample" },
-    { "id": "test_framework", "score": 4, "notes": "multi-round soak CI + fault-drill + ops-report" },
+    { "id": "health", "score": 4, "notes": "per-round soak + accept require_health_normal + wall interval" },
+    { "id": "recovery", "score": 4, "notes": "RecoveryExecutor on bench/smoke/host-recv/fault-drill" },
+    { "id": "config_management", "score": 4, "notes": "configs/ops + prometheus.yml + Grafana datasource" },
+    { "id": "test_framework", "score": 4, "notes": "multi-round timed soak CI + accept health gate" },
     { "id": "fault_injection", "score": 4, "notes": "FaultInjector + recovery wiring + drill" },
     { "id": "benchmark", "score": 4, "notes": "PipelineBench + accept + soak rounds" },
-    { "id": "dashboard", "score": 3, "notes": "Grafana JSON + prometheus.yml sample" }
+    { "id": "dashboard", "score": 4, "notes": "Grafana dashboard JSON + datasource provisioning sample" }
   ],
-  "overall_ops_score_0_to_5": 4.4,
+  "overall_ops_score_0_to_5": 4.5,
   "next_tasks": [
     "Optional: real DPDK/DOCA hardware adapter",
-    "Optional: Grafana live datasource against running Prometheus",
-    "Optional: wall-clock timed soak (sleep between rounds)"
+    "Optional: Compose --profile full in-container prom-serve evidence (G1)",
+    "Optional: minute-scale soak_profile_wall_long (G2)"
+  ],
+  "completed_optional_tasks": [
+    "Docker Compose ops stack: docker-compose.ops.yml (prom-serve+Prometheus+Grafana)",
+    "Wall-clock soak evidence profile: configs/soak_profile_wall.yaml",
+    "CUDA WSL2 smoke-cuda evidence pack"
   ]
 }

@@ -1,0 +1,7 @@
+schema_version: 1.0.0
+project_id: aether-radio-sim
+name: aether-radio-sim
+harness_neutral: true
+created_by: aetheros-bootstrap-existing-project
+created_at: 2026-08-16T06:39:03.599570+00:00
+autonomy_level: L1

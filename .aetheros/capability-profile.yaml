@@ -1,0 +1,14 @@
+schema_version: 1.0.0
+surfaces:
+  cursor_ide: requested
+  cursor_cli: disabled_until_smoke
+  cursor_cloud: disabled_until_smoke
+requires_special_hardware: optional_cuda_wsl2
+hardware_notes:
+  m1_requires_special_hardware: false
+  deferred_milestones:
+    - CUDA
+    - DPDK
+    - FPGA
+    - real_hardware
+network_policy: controlled

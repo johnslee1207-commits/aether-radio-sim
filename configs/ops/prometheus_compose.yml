@@ -1,0 +1,16 @@
+# Prometheus scrape config for docker-compose.ops.yml (default host exporter).
+# classification: local_machine_specific (host.docker.internal)
+#
+# Default topology: prom-serve on host (0.0.0.0:9898) + Prometheus/Grafana in Compose.
+# For --profile full (prom-serve container), override target to prom-serve:9898 via
+# configs/ops/prometheus_compose_full.yml if needed.
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: aether-sim
+    static_configs:
+      - targets: ["host.docker.internal:9898"]
+    metrics_path: /metrics
+    scrape_interval: 5s

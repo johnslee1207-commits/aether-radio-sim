@@ -1,0 +1,40 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "StageResult",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T06:51:30Z",
+    "command": "/aetheros-continue"
+  },
+  "terminal_status": "PARTIAL",
+  "selected_skills": [
+    "aetheros-trusted-context",
+    "aetheros-architecture",
+    "aetheros-verification"
+  ],
+  "canonical_nodes": ["P3", "P4", "P5", "P7", "P8", "P10-plan-only"],
+  "milestone_id": "M1_ops_scrape_stack_evidence",
+  "work_completed": [
+    "M1 context completeness report",
+    "C4 architecture view (draft)",
+    "ADR-M1-001 proposed",
+    "V-model verification plan (draft)",
+    "Implementation plan draft (not authorized to execute)"
+  ],
+  "work_forbidden_and_skipped": [
+    "business_code_implementation",
+    "implementation_gate",
+    "CUDA/DPDK/FPGA tasks",
+    "self-approval of completed_gate_ids"
+  ],
+  "evidence_refs": [
+    ".aetheros/plans/m1-ops-scrape-stack/context_completeness_report.json",
+    ".aetheros/plans/m1-ops-scrape-stack/c4_architecture_view.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/adr_m1_001_ops_scrape_stack.md",
+    ".aetheros/plans/m1-ops-scrape-stack/verification_plan.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/implementation_plan.yaml",
+    ".aetheros/evidence/transition_request_m1_planning_2026-08-16.json"
+  ],
+  "stop_reason": "pending_user_confirmation_of_m1_plans"
+}

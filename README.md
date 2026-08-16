@@ -1,6 +1,6 @@
 # Aether Radio Data Plane Simulation Platform
 
-**Version:** v1.1 (crate `0.1.1`) · **Ops plane:** Sprint O O001–O020
+**Version:** v1.1 (crate `0.1.1`) · **Ops plane:** Sprint O O001–O025
 
 Software simulation of Aether Radio Transport, eCPRI-like deterministic streaming, CX5/DPDK/GPUDirect-style data paths, and GPU/CPU memory models — without Xilinx FPGA, Mellanox CX5, or GPU servers.
 
@@ -127,13 +127,18 @@ Tunable models live under `configs/` (not hardcoded in Rust):
 | `configs/bench_profile_cuda.yaml` | PipelineBench with `gpu_backend: cuda` |
 | `configs/acceptance_profile.yaml` | SLA gates for `accept` CLI |
 | `configs/acceptance_profile_multistream.yaml` | Multi-stream acceptance gates |
-| `configs/soak_profile.yaml` / `_ci.yaml` | L4 soak / CI-fast soak |
+| `configs/soak_profile.yaml` / `_ci.yaml` / `_wall.yaml` / `_wall_long.yaml` | L4 soak / CI-fast / ~15s wall / ~2min wall |
 | `configs/memory_pool.yaml` | Host/GPU pool + H2D/D2H model |
 | `configs/ops/observability.yaml` | Metrics / logging / trace / health refs |
 | `configs/ops/health_policy.yaml` | Health thresholds |
 | `configs/ops/recovery_policy.yaml` | Fault-class → recovery action |
-| `configs/ops/prometheus_scrape.yaml` | `prom-serve` bind / refresh |
+| `configs/ops/prometheus_scrape.yaml` | `prom-serve` bind / refresh (host-local) |
+| `configs/ops/prometheus_scrape_compose.yaml` | `prom-serve` bind for Compose (`0.0.0.0`) |
 | `configs/ops/prometheus.yml` | Sample Prometheus scrape against `prom-serve` |
+| `configs/ops/prometheus_compose.yml` | Prometheus scrape config for Compose ops stack |
+| `data/ops/grafana/datasources/prometheus.yaml` | Grafana datasource provisioning sample (host) |
+| `data/ops/grafana/datasources/prometheus_compose.yaml` | Grafana datasource for Compose |
+
 | `configs/backends/gpu_cuda.yaml` | CUDA device / kernel policy (RTX 4050) |
 | `configs/backends/shm_link.yaml` | Same-host shared-memory ring geometry |
 | `configs/backends/shm_link_docker.yaml` | Docker named-volume shm path (`/shm/...`) |
@@ -170,6 +175,15 @@ cargo run -p aether-radio-cli -- fpga-emit --transport shm --symbols 32 --interv
 Docker Compose:
 
 ```bash
+# Ops scrape stack (prom-serve on host + Prometheus/Grafana in Compose)
+cargo run -p aether-radio-cli -- prom-serve --config configs/ops/prometheus_scrape_compose.yaml
+docker compose -f docker-compose.ops.yml up -d
+# http://127.0.0.1:9898/metrics  http://127.0.0.1:9090  http://127.0.0.1:3000
+docker compose -f docker-compose.ops.yml down
+# Optional in-compose exporter:
+docker compose -f docker-compose.ops.yml -f docker-compose.ops.full.yml --profile full up --build -d
+docker compose -f docker-compose.ops.yml -f docker-compose.ops.full.yml --profile full down
+
 # UDP split containers
 docker compose -f docker-compose.split.yml up --build
 docker compose -f docker-compose.split.yml --profile cuda up --build
@@ -177,6 +191,14 @@ docker compose -f docker-compose.split.yml --profile cuda up --build
 # Shared-volume shm (file ring at /shm; see configs/backends/shm_link_docker.yaml)
 docker compose -f docker-compose.shm.yml up --build
 # or: ./scripts/docker_shm_smoke.sh
+```
+
+Wall-clock soak evidence (not default CI):
+
+```bash
+cargo run -p aether-radio-cli -- soak --profile configs/soak_profile_wall.yaml
+# ~2 minute wall evidence:
+cargo run -p aether-radio-cli -- soak --profile configs/soak_profile_wall_long.yaml
 ```
 
 Cross-container UDP is for **functional** integration. µs / 100G acceptance uses same-process bench or shared-memory.
@@ -219,7 +241,7 @@ Business code depends on traits only (no DPDK/CUDA/sockets in business crates):
 
 ## Development rules
 
-See `AGENTS.md`. Sprint order: workspace → protocol → FPGA → transport → memory/GPU ring → benchmark → **Observability Plane (Sprint O, O001–O015 Done)**.
+See `AGENTS.md`. Sprint order: workspace → protocol → FPGA → transport → memory/GPU ring → benchmark → **Observability Plane (Sprint O, O001–O025 Done)**.
 
 Program/data decoupling: put bandwidth, latency, loss, DMA delay, fault rates, health thresholds, and scrape binds in `configs/` / `configs/ops/` — not in Rust source.
 

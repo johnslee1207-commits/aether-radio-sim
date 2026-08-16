@@ -1,0 +1,9 @@
+{
+  "acceptance_id": "AC-M1-04",
+  "evidence_id": "grafana_assets_review",
+  "datasource_present": true,
+  "dashboard_present": true,
+  "datasource_path": "data/ops/grafana/datasources/prometheus.yaml",
+  "dashboard_path": "data/ops/dashboards/aether_radio_overview.json",
+  "checked_at": "2026-08-16T06:52:11.5302872Z"
+}

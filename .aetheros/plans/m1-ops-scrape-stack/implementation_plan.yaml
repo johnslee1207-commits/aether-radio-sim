@@ -1,0 +1,72 @@
+schema_version: 1.0.0
+kind: ImplementationPlan
+project_id: aether-radio-sim
+milestone_id: M1_ops_scrape_stack_evidence
+generated_at: "2026-08-16T06:51:30Z"
+status: draft_not_authorized_to_execute
+authorization:
+  current: architecture_planning_only
+  required_before_execution:
+    - user_confirm_m1_architecture_and_verification_plans
+    - explicit_implementation_authorization
+  denied_until_then:
+    - crates/**
+    - implementation_gate
+
+decoupling_rules:
+  - Keep bind addresses, ports, scrape intervals, job names in configs/ops or Compose env files
+  - Keep Grafana provisioning under data/ops/
+  - Keep evidence manifests under .aetheros/evidence or data/reports (runtime_generated)
+  - Do not hardcode local absolute paths in Rust crates
+
+proposed_task_contracts:
+  - id: M1-T01
+    title: Add docker-compose.ops.yml for Prometheus + Grafana (+ optional prom-serve service)
+    touches_expected:
+      - docker-compose.ops.yml
+      - data/ops/** (provisioning mounts)
+      - README.md (ops compose usage)
+    business_crates: false
+  - id: M1-T02
+    title: Align network targets for containerized Prometheus→exporter reachability
+    touches_expected:
+      - configs/ops/prometheus.yml or compose-specific override under configs/ops/
+      - data/ops/grafana/datasources/prometheus.yaml if URL must differ in Compose
+    business_crates: false
+    note: Prefer overlay/profile data over editing defaults destructively
+  - id: M1-T03
+    title: Document single-command evidence procedure
+    touches_expected:
+      - README.md
+      - data/ops/grafana/README.md or configs/ops/README.md
+    business_crates: false
+  - id: M1-T04
+    title: Evidence packager script or checklist producing governed bundle
+    touches_expected:
+      - scripts/ (optional)
+      - .aetheros/evidence/ or data/reports/
+    business_crates: false
+  - id: M1-T05
+    title: Independent verification pass against verification_plan.yaml
+    role: test-engineer /aetheros-verify
+    business_crates: false
+
+explicitly_out_of_scope_tasks:
+  - CUDA feature work
+  - DPDK/DOCA adapter
+  - FPGA hardware path
+  - Dataplane protocol/transport changes
+
+risk_review:
+  - id: NET-1
+    risk: Host-only 127.0.0.1 bind may be unreachable from Prometheus container
+    mitigation: Decide host-network vs bridge+host.docker.internal vs sidecared prom-serve before coding
+    severity: high
+  - id: EVID-1
+    risk: Manual UI clicks not reproducible
+    mitigation: Prefer API/CLI evidence capture in bundle
+    severity: medium
+  - id: SCOPE-1
+    risk: Accidental crates/** edits during Compose work
+    mitigation: Keep authorization_boundary denied for business_code_implementation until explicit grant
+    severity: high

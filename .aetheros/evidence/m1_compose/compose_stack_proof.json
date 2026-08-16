@@ -1,0 +1,19 @@
+{
+  "checked_at": "2026-08-16T07:33:09.7505443Z",
+  "topology": "host_prom_serve_plus_compose_prometheus_grafana",
+  "metrics_status": 200,
+  "metrics_len": 2526,
+  "prometheus_targets_status": 200,
+  "up_targets": 1,
+  "up_jobs": [
+    "aether-sim"
+  ],
+  "grafana_health_status": 200,
+  "grafana_health": {
+    "commit": "13173c9874af312fe75545f52aa6539af02076ac",
+    "database": "ok",
+    "version": "11.1.4"
+  },
+  "compose_file": "docker-compose.ops.yml",
+  "result": "PASS"
+}

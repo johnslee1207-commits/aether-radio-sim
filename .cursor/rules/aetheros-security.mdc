@@ -1,0 +1,9 @@
+---
+description: Least-privilege security invariant for Cursor execution.
+alwaysApply: true
+---
+
+- Operate only in authorized roots and normalize Windows/WSL paths before shell or file operations.
+- Do not read credentials, tokens, SSH keys, browser stores, or `.env` files unless explicit project authority exists.
+- Do not bypass denied operations with alternative tools.
+- Production, irreversible, external-write, or destructive actions require explicit governance authority.

@@ -1,0 +1,53 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "TransitionRequest",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T06:51:30Z",
+    "requestedBy": "cursor-aetheros-continue"
+  },
+  "from": {
+    "current_stage": "INTAKE",
+    "state_version": 1,
+    "completed_gate_ids": []
+  },
+  "proposed": {
+    "current_stage": "M1_PLANNING",
+    "recognize_without_self_approve": [
+      "user_confirmed_intent_for_planning",
+      "m1_planning_artifacts_materialized"
+    ],
+    "do_not_set_completed_gate_ids": [
+      "architecture_valid",
+      "implementation_plan_valid",
+      "tests_pass",
+      "evidence_complete"
+    ],
+    "pending_user_decisions": [
+      "confirm_m1_architecture_and_verification_plans"
+    ]
+  },
+  "expected_state_version": 1,
+  "evidence_refs": [
+    ".aetheros/intent-contract.yaml",
+    ".aetheros/evidence/pending_decision_confirmation_2026-08-16.json",
+    ".aetheros/plans/m1-ops-scrape-stack/context_completeness_report.json",
+    ".aetheros/plans/m1-ops-scrape-stack/adr_m1_001_ops_scrape_stack.md",
+    ".aetheros/plans/m1-ops-scrape-stack/verification_plan.yaml",
+    ".aetheros/plans/m1-ops-scrape-stack/implementation_plan.yaml",
+    ".aetheros/evidence/stage_result_continue_m1_planning_2026-08-16.json"
+  ],
+  "authorization_boundary": {
+    "granted": [
+      "trusted_context",
+      "architecture_planning",
+      "verification_planning"
+    ],
+    "denied": [
+      "business_code_implementation",
+      "implementation_gate"
+    ]
+  },
+  "notes": "Governance/user must confirm plans before any implementation authorization. Parent agent must not mutate completed_gate_ids or state_version."
+}

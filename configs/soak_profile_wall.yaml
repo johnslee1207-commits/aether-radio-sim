@@ -1,0 +1,19 @@
+version: "1.0.0"
+id: soak-wall
+classification: project_specific
+description: >-
+  Wall-clock soak evidence profile — multi-round with sleep between rounds
+  (not for default CI; CI uses soak_profile_ci.yaml).
+bench_profile: configs/bench_profile.yaml
+fault_config: configs/fault_injection.yaml
+symbol_count_override: 128
+streams_override: 1
+report_path: data/reports/soak_wall.json
+events_path: data/reports/soak_wall_events.jsonl
+max_sequence_gaps: 0
+max_deadline_miss_ratio: 1.0
+min_packets: 64
+rounds: 4
+require_health_normal: true
+# 4 rounds with 5s gaps ≈ 15s+ wall sleep plus bench work
+round_interval_ms: 5000

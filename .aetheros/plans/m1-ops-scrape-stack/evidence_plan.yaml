@@ -1,0 +1,73 @@
+schema_version: 1.0.0
+kind: M1EvidencePlan
+project_id: aether-radio-sim
+milestone_id: M1_ops_scrape_stack_evidence
+generated_at: "2026-08-16T06:52:30Z"
+status: draft
+implementation_authorized: false
+soak_authorized: false
+
+bundle:
+  proposed_id: m1_ops_scrape_evidence_pack
+  proposed_root: .aetheros/evidence/m1_ops_scrape/
+  runtime_artifacts_root: data/reports/
+  manifest_filename: evidence_manifest.json
+
+mapping:
+  - acceptance_id: AC-M1-01
+    evidence_id: metrics_http_proof
+    capture:
+      - Run prom-serve --once (or one successful GET /metrics while serving)
+      - Store HTTP status + first lines or content hash of /metrics
+    artifact_candidates:
+      - data/reports/metrics.prom
+      - .aetheros/evidence/m1_ops_scrape/metrics_http_proof.json
+
+  - acceptance_id: AC-M1-02
+    evidence_id: ops_report_json
+    capture:
+      - Run ops-report to data/reports/ops_report.json
+      - Record command, exit code, file path, mtime
+    artifact_candidates:
+      - data/reports/ops_report.json
+
+  - acceptance_id: AC-M1-03
+    evidence_id: prometheus_config_review
+    capture:
+      - Record path + job/target excerpt from configs/ops/prometheus.yml
+      - Optional (if Prometheus binary available): targets snapshot showing aether-sim UP
+    artifact_candidates:
+      - .aetheros/evidence/m1_ops_scrape/prometheus_config_review.json
+      - .aetheros/evidence/m1_ops_scrape/prometheus_targets.json
+
+  - acceptance_id: AC-M1-04
+    evidence_id: grafana_assets_review
+    capture:
+      - Confirm datasource YAML URL and dashboard JSON path exist
+      - Optional (if Grafana available): datasource health API result
+    artifact_candidates:
+      - .aetheros/evidence/m1_ops_scrape/grafana_assets_review.json
+
+  - acceptance_id: AC-M1-05
+    evidence_id: evidence_bundle_manifest
+    capture:
+      - Write evidence_manifest.json listing all proofs + commands + timestamps
+    artifact_candidates:
+      - .aetheros/evidence/m1_ops_scrape/evidence_manifest.json
+
+  - acceptance_id: AC-M1-06
+    evidence_id: procedure_constraint_review
+    capture:
+      - Checklist proving no cuda feature, no DPDK hardware, no FPGA hardware, no long soak
+    artifact_candidates:
+      - .aetheros/evidence/m1_ops_scrape/procedure_constraint_review.json
+
+roles:
+  producer: implementation-agent or operator (when authorized)
+  independent_verifier: test-engineer via /aetheros-verify
+  forbidden: self-approval by producer; mutating completed_gate_ids
+
+exclusions:
+  - Long wall-clock soak profiles (minutes+)
+  - fault-drill as M1 primary evidence (optional adjunct only)
+  - Business code patches as evidence substitutes

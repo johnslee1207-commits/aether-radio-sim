@@ -1,0 +1,4 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.86s
+     Running `target/debug/aether-radio-sim gpu-info`
+cuda feature: enabled
+[0] NVIDIA GeForce RTX 4050 Laptop GPU

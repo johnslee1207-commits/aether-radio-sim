@@ -308,6 +308,11 @@ Agent 规则补充：
 | O018 | Prometheus scrape sample | **Done** — `configs/ops/prometheus.yml` |
 | O019 | Ops report JSON CLI | **Done** — `ops-report` |
 | O020 | Docs/matrix/CI closeout | **Done** — matrix v1.4 |
+| O021 | Wall-clock soak interval | **Done** — `round_interval_ms` |
+| O022 | Grafana datasource sample | **Done** — `data/ops/grafana/` |
+| O023 | Accept health gate | **Done** — `require_health_normal` |
+| O024 | host-recv recovery + ring metrics | **Done** |
+| O025 | Docs/matrix closeout | **Done** — matrix v1.5 |
 
 ---
 

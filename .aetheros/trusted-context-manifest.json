@@ -1,0 +1,138 @@
+{
+  "schema_version": "1.0.0",
+  "status": "approved_for_planning",
+  "project_id": "aether-radio-sim",
+  "updated_at": "2026-08-16T06:51:30Z",
+  "sources": [
+    {
+      "type": "repository",
+      "path": ".",
+      "trust": "project_source",
+      "captured_at": "2026-08-16T06:43:54Z"
+    },
+    {
+      "type": "spec",
+      "path": "docs/CURSOR_DEVELOPMENT_SPEC_v1.1.md",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:43:54Z"
+    },
+    {
+      "type": "spec",
+      "path": "docs/AETHER_RADIO_OBSERVABILITY_OPS_FRAMEWORK_v1.0.md",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:43:54Z"
+    },
+    {
+      "type": "registry",
+      "path": "data/architecture/observability_coverage_matrix.json",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:43:54Z"
+    },
+    {
+      "type": "agent_rules",
+      "path": "AGENTS.md",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:43:54Z"
+    },
+    {
+      "type": "ops_config",
+      "path": "configs/ops/prometheus_scrape.yaml",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:51:30Z"
+    },
+    {
+      "type": "ops_config",
+      "path": "configs/ops/prometheus.yml",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:51:30Z"
+    },
+    {
+      "type": "ops_config",
+      "path": "data/ops/grafana/datasources/prometheus.yaml",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:51:30Z"
+    },
+    {
+      "type": "ops_dashboard",
+      "path": "data/ops/dashboards/aether_radio_overview.json",
+      "trust": "project_authority",
+      "captured_at": "2026-08-16T06:51:30Z"
+    },
+    {
+      "type": "user_input",
+      "path": "conversation:pending-decision-confirmation",
+      "trust": "user_confirmed_decisions",
+      "captured_at": "2026-08-16T06:50:00Z"
+    },
+    {
+      "type": "plan",
+      "path": ".aetheros/plans/m1-ops-scrape-stack/",
+      "trust": "planning_artifact",
+      "captured_at": "2026-08-16T06:51:30Z"
+    }
+  ],
+  "facts": [
+    {
+      "id": "product_identity",
+      "statement": "Project is Aether Radio Data Plane Simulation Platform v1.1 (crate 0.1.1).",
+      "provenance": ["README.md", "Cargo.toml", "AGENTS.md"]
+    },
+    {
+      "id": "m1_selected",
+      "statement": "First R&D milestone is M1 Governed ops scrape stack evidence pack.",
+      "provenance": [".aetheros/intent-contract.yaml"]
+    },
+    {
+      "id": "prom_serve_bind",
+      "statement": "Default prom-serve bind is 127.0.0.1:9898 path /metrics (configs/ops/prometheus_scrape.yaml).",
+      "provenance": ["configs/ops/prometheus_scrape.yaml"]
+    },
+    {
+      "id": "prometheus_scrape_sample",
+      "statement": "Prometheus sample scrapes job aether-sim at 127.0.0.1:9898.",
+      "provenance": ["configs/ops/prometheus.yml"]
+    },
+    {
+      "id": "grafana_assets_present",
+      "statement": "Grafana datasource sample and overview dashboard JSON already exist under data/ops/.",
+      "provenance": ["data/ops/grafana/datasources/prometheus.yaml", "data/ops/dashboards/aether_radio_overview.json"]
+    },
+    {
+      "id": "no_ops_compose_yet",
+      "statement": "Existing docker-compose files cover cuda/shm/split dataplane only; no ops scrape compose file yet.",
+      "provenance": ["docker-compose.cuda.yml", "docker-compose.shm.yml", "docker-compose.split.yml", ".aetheros/plans/m1-ops-scrape-stack/context_completeness_report.json"]
+    },
+    {
+      "id": "intent_approved_planning_only",
+      "statement": "Intent contract is approved for trusted context, architecture planning, and verification planning only.",
+      "provenance": [".aetheros/intent-contract.yaml"]
+    },
+    {
+      "id": "special_hardware_class",
+      "statement": "Special hardware classification is optional_cuda_wsl2; M1 does not depend on CUDA/DPDK/FPGA/real hardware.",
+      "provenance": [".aetheros/capability-profile.yaml"]
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "compose_topology_host_vs_bridge",
+      "statement": "Final Compose networking choice (host vs bridge + published ports / host.docker.internal) remains open until user confirms ADR.",
+      "needs_confirmation": true
+    }
+  ],
+  "inferences": [
+    {
+      "id": "m1_is_integration_evidence",
+      "statement": "M1 is primarily integration/evidence over existing CLI ops surfaces, not a dataplane protocol change.",
+      "from": ["prom_serve_bind", "grafana_assets_present", "no_ops_compose_yet"]
+    }
+  ],
+  "open_context_gaps": [
+    "User confirmation of M1 architecture ADR + verification plan",
+    "Compose topology decision (host vs bridge networking)",
+    "Evidence bundle schema filename/location finalization",
+    "Cursor CLI/Cloud surfaces disabled_until_smoke",
+    "Ops framework vs coverage matrix Trace wording drift",
+    ".aetheros authority files not yet committed to git"
+  ]
+}

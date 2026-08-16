@@ -1,0 +1,8 @@
+{
+  "schema_version": "1.0.0",
+  "aetheros_core": ">=1.0.0 <2.0.0",
+  "cursor_materialization": "1.0.0",
+  "project_state_schema": "1.0.0",
+  "domain_pack_api": "1.x",
+  "bootstrapped_by": "D:\\Projects\\aetheros\\aetheros-autonomous-rd"
+}

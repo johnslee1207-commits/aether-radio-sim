@@ -13,3 +13,4 @@ max_deadline_miss_ratio: 1.0
 min_packets: 32
 rounds: 2
 require_health_normal: true
+round_interval_ms: 10

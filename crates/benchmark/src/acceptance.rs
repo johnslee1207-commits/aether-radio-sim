@@ -2,6 +2,7 @@
 
 use crate::{BenchProfile, BenchReport, PipelineBench, PipelineBenchError};
 use ethernet_model::EthernetModelConfig;
+use metrics_engine::{HealthManager, HealthState, HealthThresholds};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -20,6 +21,15 @@ pub struct AcceptanceProfile {
     pub max_symbol_miss: u64,
     pub min_packets: u64,
     pub report_path: String,
+    #[serde(default = "default_health_policy")]
+    pub health_policy: String,
+    /// When true, HealthManager must evaluate to NORMAL after the bench.
+    #[serde(default)]
+    pub require_health_normal: bool,
+}
+
+fn default_health_policy() -> String {
+    "configs/ops/health_policy.yaml".into()
 }
 
 impl AcceptanceProfile {
@@ -48,6 +58,8 @@ pub struct AcceptanceReport {
     pub passed: bool,
     pub gates: Vec<GateResult>,
     pub bench: BenchReport,
+    #[serde(default)]
+    pub health: Option<String>,
 }
 
 #[derive(Debug, Error)]
@@ -103,7 +115,7 @@ impl AcceptanceRunner {
         let bench_yaml = fs::read_to_string(&bench_path)
             .map_err(|e| AcceptanceError::Config(format!("read {}: {e}", bench_path.display())))?;
         let bench_profile = BenchProfile::from_yaml_str(&bench_yaml)?;
-        let (bench, _metrics) = PipelineBench::new(bench_profile)
+        let (bench, metrics) = PipelineBench::new(bench_profile)
             .with_base_dir(&self.base_dir)
             .run()?;
 
@@ -133,12 +145,26 @@ impl AcceptanceRunner {
             detail: format!("{} <= {}", bench.radio.symbol_miss, p.max_symbol_miss),
         });
 
+        let thr =
+            HealthThresholds::load_path(self.base_dir.join(&p.health_policy)).unwrap_or_default();
+        let mut health = HealthManager::new(thr);
+        let _ = health.evaluate(&metrics.layered_snapshot(), None);
+        let health_state = health.state();
+        if p.require_health_normal {
+            gates.push(GateResult {
+                name: "health_normal".into(),
+                passed: health_state == HealthState::Normal,
+                detail: health_state.as_str().to_string(),
+            });
+        }
+
         let passed = gates.iter().all(|g| g.passed);
         let report = AcceptanceReport {
             profile_id: p.id.clone(),
             passed,
             gates,
             bench,
+            health: Some(health_state.as_str().to_string()),
         };
 
         if let Some(parent) = Path::new(&p.report_path).parent() {
@@ -182,5 +208,6 @@ mod tests {
             .expect("acceptance should pass");
         assert!(report.passed);
         assert!(report.gates.iter().all(|g| g.passed));
+        assert_eq!(report.health.as_deref(), Some("NORMAL"));
     }
 }

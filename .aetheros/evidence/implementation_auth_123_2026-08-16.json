@@ -1,0 +1,31 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "ImplementationAuthorization",
+  "metadata": {
+    "generatedAt": "2026-08-16T07:04:00Z",
+    "project_id": "aether-radio-sim",
+    "source": "user_message"
+  },
+  "statement": "请依次完成123",
+  "authorized_items": [
+    {
+      "id": 1,
+      "title": "M1-Compose docker-compose.ops.yml",
+      "allows_business_code": false,
+      "allows_compose_config_docs": true
+    },
+    {
+      "id": 2,
+      "title": "Longer wall-clock soak profile + evidence",
+      "allows_config": true,
+      "allows_long_soak_minutes_plus": false,
+      "note": "Use soak_profile_wall.yaml (multi-round seconds-scale wall clock), not hour-long soak"
+    },
+    {
+      "id": 3,
+      "title": "CUDA WSL2 evidence pack",
+      "allows_cuda_feature_runs": true
+    }
+  ],
+  "implementation_gate": "authorized_for_items_1_2_3_only"
+}

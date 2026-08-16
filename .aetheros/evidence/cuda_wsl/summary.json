@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-08-16T07:32:30Z",
+  "status": "PASS",
+  "gpu": "NVIDIA GeForce RTX 4050 Laptop GPU",
+  "commands": [
+    "wsl: cargo build -p aether-radio-cli --features cuda",
+    "wsl: cargo run -p aether-radio-cli --features cuda -- gpu-info",
+    "wsl: cargo run -p aether-radio-cli --features cuda -- smoke-cuda"
+  ],
+  "artifacts": [
+    ".aetheros/evidence/cuda_wsl/gpu_info.txt",
+    ".aetheros/evidence/cuda_wsl/smoke_cuda.txt"
+  ],
+  "code_fix": "crates/benchmark/src/pipeline.rs — let mut process_one (E0596 under --features cuda)"
+}

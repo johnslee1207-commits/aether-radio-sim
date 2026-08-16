@@ -20,6 +20,18 @@ Coverage: `data/architecture/observability_coverage_matrix.json`.
 3. Each crate must keep `README.md`, unit tests, and (when applicable) bench hooks.
 4. **Observability is first-class.** Every datapath change includes Metrics hook → Log/Event hook → Trace hook (when TraceEngine exists) before considering the task done. Policies live under `configs/ops/`.
 
+## AetherOS default routing
+
+Any natural-language development intent such as "I want to implement", "希望实现", "要做", "新增", "优化", "修复", or "改进" defaults to AetherOS intake before coding.
+
+For those requests, read `.aetheros/project-state.json`, identify current stage and pending decisions, draft or update intent/context/risk/acceptance criteria, and stop at the next user-confirmation gate.
+
+Do not directly edit business code unless the user explicitly says to skip AetherOS governance or directly authorizes code changes.
+
+### Codex compatibility
+
+When this project is opened in Codex, apply the same default route: natural-language development intent enters AetherOS intake first, then waits at the next user-confirmation gate before business-code implementation.
+
 ## Sprint map
 
 | Sprint | Focus |
@@ -30,7 +42,7 @@ Coverage: `data/architecture/observability_coverage_matrix.json`.
 | 4 | Transport stream/sequence/timestamp — **Done** |
 | 5 | Host/GPU memory (+ ring BufferState) — **Done** |
 | 6 | Benchmark + metrics harness — **Done** |
-| O | Observability & Operations Plane — **O001–O020 Done** |
+| O | Observability & Operations Plane — **O001–O025 Done** |
 
 <!-- program-data-decoupling:start -->
 # Program/Data Decoupling

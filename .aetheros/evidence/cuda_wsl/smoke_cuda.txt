@@ -1,0 +1,5 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.43s
+     Running `target/debug/aether-radio-sim smoke-cuda`
+CUDA device 0 'NVIDIA GeForce RTX 4050 Laptop GPU' (ordinal 0)
+cuda packet: bytes=512 kernel_ns=120408 device=NVIDIA GeForce RTX 4050 Laptop GPU
+smoke-cuda ok: rx=1 tx=1 now_ns=122408 seq_gaps=0 late=0 metrics={"link":{"rx_packets":1,"tx_packets":1,"bandwidth_bps":0.0,"drop":0,"error":0},"transport":{"sequence_gap":0,"late_packet":0,"jitter_ns":0,"latency_ns":0},"radio":{"slot_latency_ns":0,"symbol_latency_ns":0,"deadline_miss":0}}

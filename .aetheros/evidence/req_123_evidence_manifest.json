@@ -1,0 +1,48 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "EvidenceManifest",
+  "metadata": {
+    "id": "req_123_compose_soak_cuda",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T07:32:30Z"
+  },
+  "authorization": ".aetheros/evidence/implementation_auth_123_2026-08-16.json",
+  "items": [
+    {
+      "id": 1,
+      "title": "M1 Compose ops stack",
+      "status": "PASS",
+      "artifacts": [
+        "docker-compose.ops.yml",
+        "configs/ops/prometheus_scrape_compose.yaml",
+        "configs/ops/prometheus_compose.yml",
+        "data/ops/grafana/datasources/prometheus_compose.yaml",
+        ".aetheros/evidence/m1_compose/compose_stack_proof.json"
+      ],
+      "notes": "Default topology: host prom-serve + Compose Prometheus/Grafana; --profile full optional"
+    },
+    {
+      "id": 2,
+      "title": "Wall-clock soak evidence",
+      "status": "PASS",
+      "artifacts": [
+        "configs/soak_profile_wall.yaml",
+        "data/reports/soak_wall.json",
+        ".aetheros/evidence/soak_wall/summary.json"
+      ],
+      "notes": "elapsed_wall_ms≈15053, rounds=4, health NORMAL each round"
+    },
+    {
+      "id": 3,
+      "title": "CUDA WSL2 evidence pack",
+      "status": "PASS",
+      "artifacts": [
+        ".aetheros/evidence/cuda_wsl/gpu_info.txt",
+        ".aetheros/evidence/cuda_wsl/smoke_cuda.txt"
+      ],
+      "notes": "Fixed cuda-feature compile: mut process_one in crates/benchmark/src/pipeline.rs; RTX 4050 smoke-cuda ok",
+      "gitnexus_impact": "GitNexus MCP unavailable; minimal mutability fix only; risk treated as low for closure symbol"
+    }
+  ],
+  "overall": "PASS"
+}

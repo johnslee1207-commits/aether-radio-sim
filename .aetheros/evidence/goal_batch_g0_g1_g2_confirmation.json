@@ -1,0 +1,14 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "PendingDecisionConfirmation",
+  "metadata": {
+    "generatedAt": "2026-08-16T14:20:00Z",
+    "project_id": "aether-radio-sim",
+    "source": "user_message"
+  },
+  "decision_id": "select_next_user_goal_batch",
+  "choice": "G0_G1_G2",
+  "statement": "同意，请按照建议下一批执行aetheros模式研发",
+  "batch": ["G0", "G1", "G2"],
+  "mode": "aetheros_implementation_with_evidence"
+}
