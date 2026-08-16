@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-08-16T23:37:21Z",
+  "status": "PASS",
+  "root_cause": "ShmPacketSink::open forced create=true, truncating mmap'd ring under host-recv (WSL Bus error)",
+  "fix": "crates/shm-io/src/lib.rs — respect ShmLinkConfig.create",
+  "regression_test": "open_sink_without_create_does_not_truncate_prepared_ring",
+  "retest": {
+    "script": "scripts/shm_dual_smoke.sh",
+    "exit_code": 0,
+    "host_recv": "accepted=32/32 seq_gaps=0",
+    "log": ".aetheros/evidence/g6_dual_process/shm_dual_process_retest.txt"
+  }
+}

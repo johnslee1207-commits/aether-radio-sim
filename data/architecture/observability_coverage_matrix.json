@@ -34,8 +34,7 @@
   ],
   "overall_ops_score_0_to_5": 4.5,
   "next_tasks": [
-    "Optional: investigate WSL SHM dual-process Bus error",
-    "Optional: G8 real FPGA bitstream integration (hardware governance required)",
+    "Blocked: G8 real FPGA bitstream integration pending authorize_g8_hardware_lab",
     "Optional: DPDK hardware feature-gate after dedicated environment"
   ],
   "completed_optional_tasks": [
@@ -49,6 +48,7 @@
     "G4 AetherOS capability smoke (cursor_cli smoke_passed_local)",
     "G5 Ops Framework Trace doc drift alignment",
     "G6 UDP dual-process regression evidence",
-    "G7 DPDK adapter boundary spike (stub crate, hardware off)"
+    "G7 DPDK adapter boundary spike (stub crate, hardware off)",
+    "SHM dual-process Bus error fix (ShmPacketSink create truncate)"
   ]
 }

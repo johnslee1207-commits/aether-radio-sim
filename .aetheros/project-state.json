@@ -1,37 +1,36 @@
 {
   "schema_version": "1.0.0",
   "project_id": "aether-radio-sim",
-  "current_stage": "GOAL_BATCH_G6_G7_COMPLETE",
+  "current_stage": "G8_AWAITING_HARDWARE_AUTH",
   "status": "RUNNING",
   "state_version": 1,
-  "last_verified_commit": "433e8d9",
+  "last_verified_commit": "c0bb4d2",
   "active_task_ids": [],
   "completed_gate_ids": [],
   "pending_decisions": [
-    "select_next_user_goal_batch"
+    "authorize_g8_hardware_lab"
   ],
-  "blocked_reasons": [],
-  "latest_evidence_bundle": ".aetheros/evidence/goal_batch_g6_g7_manifest.json",
-  "ready_for": "user_select_next_goals",
+  "blocked_reasons": [
+    "G8 real FPGA integration requires explicit hardware governance"
+  ],
+  "latest_evidence_bundle": ".aetheros/evidence/continue_shm_g8_stage_result.json",
+  "ready_for": "authorize_g8_or_select_other_goal",
   "goal_backlog": ".aetheros/plans/user_goal_backlog.yaml",
-  "completed_goal_batch": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7"],
+  "completed_goal_batch": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "SHM_FIX", "G8_PLANNING"],
   "authorization_boundary": {
     "granted": [
       "trusted_context",
       "architecture_planning",
       "verification_planning",
-      "goal_batch_G0_G1_G2",
-      "goal_batch_G3_G4_G5",
-      "goal_batch_G6_G7"
+      "goal_batch_G0_through_G7",
+      "shm_fix",
+      "g8_acceptance_contract_draft"
     ],
-    "denied": []
+    "denied": [
+      "g8_hardware_lab_implementation"
+    ]
   },
   "selected_milestone": "M1_ops_scrape_stack_evidence",
-  "milestone_status": "g0_through_g7_pass",
-  "plan_root": ".aetheros/plans/m1-ops-scrape-stack/",
-  "remote": {
-    "pushed_through": "893724c",
-    "pending_push_after_g6_g7": false
-  }
+  "milestone_status": "g0_g7_complete_shm_fixed_g8_blocked",
+  "plan_root": ".aetheros/plans/m1-ops-scrape-stack/"
 }
-

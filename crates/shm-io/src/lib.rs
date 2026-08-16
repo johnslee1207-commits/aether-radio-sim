@@ -217,10 +217,10 @@ pub struct ShmPacketSink {
 
 impl ShmPacketSink {
     pub fn open(cfg: &ShmLinkConfig) -> Result<Self, ShmIoError> {
-        let mut c = cfg.clone();
-        c.create = true;
+        // Respect `cfg.create`. Forcing create=true here truncated an existing ring
+        // while host-recv still held an mmap (Bus error on Linux/WSL dual-process).
         Ok(Self {
-            ring: ShmPacketRing::open(&c)?,
+            ring: ShmPacketRing::open(cfg)?,
         })
     }
 
@@ -324,6 +324,36 @@ mod tests {
         let got = cons.rx_burst(8);
         assert_eq!(got.len(), 5);
         assert_eq!(got[4].sequence.0, 4);
+        let _ = std::fs::remove_file(path);
+    }
+
+    #[test]
+    fn open_sink_without_create_does_not_truncate_prepared_ring() {
+        let stamp = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        let path = std::env::temp_dir().join(format!("aether_shm_ntruc_{stamp}.bin"));
+        let mut prep = ShmLinkConfig {
+            version: "1.0.0".into(),
+            id: "test".into(),
+            path: path.to_string_lossy().into(),
+            slot_count: 8,
+            slot_bytes: 1024,
+            create: true,
+        };
+        let _ = ShmPacketSink::open(&prep).unwrap();
+        let len_after_prep = std::fs::metadata(&path).unwrap().len();
+
+        prep.create = false;
+        let mut sink = ShmPacketSink::open(&prep).unwrap();
+        let len_after_reopen = std::fs::metadata(&path).unwrap().len();
+        assert_eq!(len_after_prep, len_after_reopen);
+
+        let pkt = Packet::new(StreamId(1), Sequence(0), Timestamp(0), vec![9; 8]);
+        sink.send_packet(&pkt).unwrap();
+        let mut cons = ShmPacketIO::open(&prep).unwrap();
+        assert_eq!(cons.rx_burst(1).len(), 1);
         let _ = std::fs::remove_file(path);
     }
 }

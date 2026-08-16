@@ -1,0 +1,32 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "StageResult",
+  "metadata": {
+    "generatedAt": "2026-08-17T00:00:00Z",
+    "command": "continue"
+  },
+  "terminal_status": "PARTIAL",
+  "completed": [
+    {
+      "id": "SHM_FIX",
+      "status": "PASS"
+    },
+    {
+      "id": "G8_PLANNING",
+      "status": "PASS_PLANNING_ONLY",
+      "artifact": ".aetheros/plans/g8-fpga-hardware/acceptance_contract.md"
+    }
+  ],
+  "blocked": [
+    {
+      "id": "G8_IMPLEMENTATION",
+      "reason": "hardware_governance_required",
+      "pending_decision": "authorize_g8_hardware_lab"
+    }
+  ],
+  "evidence_refs": [
+    ".aetheros/evidence/g6_dual_process/shm_fix_summary.json",
+    ".aetheros/plans/g8-fpga-hardware/acceptance_contract.md",
+    ".aetheros/evidence/continue_shm_g8_confirmation.json"
+  ]
+}

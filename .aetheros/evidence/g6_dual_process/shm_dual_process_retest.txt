@@ -1,0 +1,15 @@
+   Compiling shm-io v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/shm-io)
+   Compiling aether-radio-cli v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 01s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.68s
+     Running `target/debug/aether-radio-sim shm-prepare --shm-config configs/backends/shm_link.yaml`
+shm-prepare ok: path=data/reports/shm_link.bin
+    Blocking waiting for file lock on build directory
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.95s
+     Running `target/debug/aether-radio-sim fpga-emit --transport shm --shm-config configs/backends/shm_link.yaml --symbols 32 --interval-us 50`
+fpga-emit ok: transport=shm sent=32 path=data/reports/shm_link.bin
+---- host-recv log ----
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.84s
+     Running `target/debug/aether-radio-sim host-recv --transport shm --shm-config configs/backends/shm_link.yaml --deadline configs/transport_deadline_net.yaml --symbols 32 --warmup-ms 200`
+host-recv ok: transport=shm accepted=32/32 udp_rx=0 decode_err=0 seq_gaps=0 late=0 metrics={"link":{"rx_packets":64,"tx_packets":32,"bandwidth_bps":0.0,"drop":0,"error":0},"transport":{"sequence_gap":0,"late_packet":0,"jitter_ns":3000,"latency_ns":0},"radio":{"slot_latency_ns":0,"symbol_latency_ns":0,"deadline_miss":0}}
+shm dual-process smoke done

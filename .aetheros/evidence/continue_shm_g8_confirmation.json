@@ -1,0 +1,13 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "PendingDecisionConfirmation",
+  "metadata": {
+    "generatedAt": "2026-08-17T00:00:00Z",
+    "source": "user_message"
+  },
+  "decision_id": "select_next_user_goal_batch",
+  "choice": "shm_fix_then_g8_governance_only",
+  "statement": "请继续",
+  "batch": ["SHM_FIX", "G8_PLANNING"],
+  "g8_implementation_authorized": false
+}
