@@ -4,7 +4,7 @@
   "current_stage": "GOAL_BATCH_G6_G7_COMPLETE",
   "status": "RUNNING",
   "state_version": 1,
-  "last_verified_commit": "893724c",
+  "last_verified_commit": "433e8d9",
   "active_task_ids": [],
   "completed_gate_ids": [],
   "pending_decisions": [
@@ -31,6 +31,7 @@
   "plan_root": ".aetheros/plans/m1-ops-scrape-stack/",
   "remote": {
     "pushed_through": "893724c",
-    "pending_push_after_g6_g7": true
+    "pending_push_after_g6_g7": false
   }
 }
+
