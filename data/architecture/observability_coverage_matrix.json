@@ -35,7 +35,7 @@
   "overall_ops_score_0_to_5": 4.5,
   "next_tasks": [
     "Optional: real DPDK/DOCA hardware adapter",
-    "Optional: G3 CUDA bench evidence / G4 AetherOS capability smoke / G5 doc drift"
+    "Optional: G6 dual-process/Compose regression evidence / G7 DPDK spike"
   ],
   "completed_optional_tasks": [
     "Docker Compose ops stack: docker-compose.ops.yml (prom-serve+Prometheus+Grafana)",
@@ -43,6 +43,9 @@
     "CUDA WSL2 smoke-cuda evidence pack",
     "G0 baseline commit e03bf00",
     "G1 Compose --profile full in-container prom-serve evidence",
-    "G2 minute-scale soak_profile_wall_long (~120s wall)"
+    "G2 minute-scale soak_profile_wall_long (~120s wall)",
+    "G3 CUDA PipelineBench evidence (bench_profile_cuda)",
+    "G4 AetherOS capability smoke (cursor_cli smoke_passed_local)",
+    "G5 Ops Framework Trace doc drift alignment"
   ]
 }

@@ -79,7 +79,7 @@ cargo test -p gpu-cuda --features cuda
 
 Config: `configs/backends/gpu_cuda.yaml`, profile `configs/simulation_profile_cuda.yaml`.
 
-Note: host toolkit may be CUDA 11.5 while Ada is sm_89. Checked-in PTX targets `sm_80` and JITs on RTX 4050. Prefer regenerating PTX with CUDA 12 Docker (`./scripts/build_cuda_ptx.sh`) when available.
+Note: host toolkit may be CUDA 11.5 while Ada is sm_89. Checked-in PTX targets `sm_80` and JITs on RTX 4050. Prefer regenerating PTX with CUDA 12 Docker (`./scripts/build_cuda_ptx.sh`) when available. Evidence pack for PipelineBench CUDA: `.aetheros/evidence/cuda_wsl/bench_cuda_summary.json` (via `./scripts/wsl_bench_cuda.sh`).
 
 ### Docker (CUDA 12 devel)
 

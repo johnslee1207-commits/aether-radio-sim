@@ -1,0 +1,42 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "EvidenceManifest",
+  "metadata": {
+    "id": "goal_batch_g3_g4_g5",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-16T15:45:00Z"
+  },
+  "confirmation": ".aetheros/evidence/goal_batch_g3_g4_g5_confirmation.json",
+  "items": [
+    {
+      "id": "G3",
+      "status": "PASS",
+      "artifacts": [
+        ".aetheros/evidence/cuda_wsl/bench_cuda.json",
+        ".aetheros/evidence/cuda_wsl/bench_cuda_summary.json",
+        ".aetheros/evidence/cuda_wsl/bench_cuda_run.txt"
+      ],
+      "notes": "WSL PipelineBench cuda profile packets=64 sequence_gaps=0; CUDA not a default CI gate"
+    },
+    {
+      "id": "G4",
+      "status": "PASS",
+      "artifacts": [
+        ".aetheros/capability-smoke.yaml",
+        ".aetheros/evidence/capability_smoke_g4/summary.json",
+        ".aetheros/capability-profile.yaml"
+      ],
+      "notes": "cursor_cli promoted to smoke_passed_local; cloud remains disabled_until_dedicated_cloud_smoke"
+    },
+    {
+      "id": "G5",
+      "status": "PASS",
+      "artifacts": [
+        "docs/AETHER_RADIO_OBSERVABILITY_OPS_FRAMEWORK_v1.0.md",
+        ".aetheros/evidence/doc_drift_g5/summary.json"
+      ],
+      "notes": "Trace §3/§7 aligned with coverage matrix score 4 / O003–O012 Done"
+    }
+  ],
+  "overall": "PASS"
+}

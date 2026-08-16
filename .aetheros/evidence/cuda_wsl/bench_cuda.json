@@ -1,0 +1,25 @@
+{
+  "throughput": {
+    "gbps": 0.005816340588028076,
+    "gbs": 0.0007270425735035094,
+    "pps": 1420.0050263740418
+  },
+  "latency": {
+    "min_ns": 52844,
+    "p50_ns": 62044,
+    "p99_ns": 147750,
+    "p999_ns": 147750,
+    "max_ns": 161251
+  },
+  "radio": {
+    "slot_miss": 0,
+    "symbol_miss": 0
+  },
+  "packets": 64,
+  "bytes": 32768,
+  "sequence_gaps": 0,
+  "late_packets": 0,
+  "sim_duration_ns": 45070263,
+  "recovery_actions": 0,
+  "ring_occupancy_peak": 0
+}

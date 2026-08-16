@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-08-16T15:41:51Z",
+  "status": "PASS",
+  "fail_count": 0,
+  "checklist": ".aetheros/capability-smoke.yaml",
+  "steps": [
+    { "id": "CS-01", "command": "cargo run -p aether-radio-cli -- info", "exit_code": 0 },
+    { "id": "CS-02", "command": "cargo run -p aether-radio-cli -- smoke --profile configs/simulation_profile.yaml", "exit_code": 0, "notes": "health=NORMAL traces_exported=1" },
+    { "id": "CS-03", "command": "cargo run -p aether-radio-cli -- ops-status", "exit_code": 0 },
+    { "id": "CS-04", "command": "prom-serve --once + GET /metrics", "exit_code": 0, "scrape_status": 200 },
+    { "id": "CS-05", "command": "cargo test -p aether-types --lib", "exit_code": 0 }
+  ],
+  "promotion": {
+    "cursor_cli": "smoke_passed_local",
+    "cursor_cloud": "disabled_until_dedicated_cloud_smoke"
+  }
+}

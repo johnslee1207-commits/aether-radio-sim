@@ -1,0 +1,20 @@
+# AetherOS capability smoke (local Cursor harness)
+# classification: project_specific
+# Purpose: promote capability-profile surfaces after documented PASS.
+schema_version: 1.0.0
+id: aetheros-capability-smoke-local
+commands:
+  - id: CS-01
+    command: cargo run -p aether-radio-cli -- info
+  - id: CS-02
+    command: cargo run -p aether-radio-cli -- smoke --profile configs/simulation_profile.yaml
+  - id: CS-03
+    command: cargo run -p aether-radio-cli -- ops-status
+  - id: CS-04
+    command: cargo run -p aether-radio-cli -- prom-serve --once
+  - id: CS-05
+    command: cargo test -p aether-types --lib
+promotion_on_pass:
+  cursor_cli: smoke_passed_local
+  cursor_cloud: disabled_until_dedicated_cloud_smoke
+  note: Cloud surface stays disabled until a separate cloud-agent smoke is recorded.

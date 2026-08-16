@@ -1,0 +1,69 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling thiserror v2.0.19
+   Compiling zmij v1.0.23
+   Compiling cudarc v0.13.9
+   Compiling libc v0.2.189
+   Compiling anyhow v1.0.104
+   Compiling serde_json v1.0.151
+   Compiling syn v3.0.3
+   Compiling syn v2.0.119
+   Compiling memmap2 v0.9.11
+   Compiling serde_derive v1.0.229
+   Compiling thiserror-impl v2.0.19
+   Compiling tokio-macros v2.7.2
+   Compiling clap_derive v4.6.4
+   Compiling tracing-attributes v0.1.31
+   Compiling tokio v1.53.1
+   Compiling tracing v0.1.44
+   Compiling clap v4.6.5
+   Compiling serde_yaml v0.9.34+deprecated
+   Compiling aether-types v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/aether-types)
+   Compiling tracing-serde v0.2.0
+   Compiling tracing-subscriber v0.3.23
+   Compiling aether-protocol v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/aether-protocol)
+   Compiling cx5-emulator v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/cx5-emulator)
+   Compiling gpu-runtime v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/gpu-runtime)
+   Compiling ethernet-model v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/ethernet-model)
+   Compiling aether-transport v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/aether-transport)
+   Compiling fpga-emulator v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/fpga-emulator)
+   Compiling fault-injection v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/fault-injection)
+   Compiling metrics-engine v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/metrics-engine)
+   Compiling memory-manager v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/memory-manager)
+   Compiling net-io v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/net-io)
+   Compiling shm-io v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/shm-io)
+   Compiling gpu-cuda v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/gpu-cuda)
+   Compiling benchmark v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/benchmark)
+   Compiling aether-radio-cli v0.1.1 (/mnt/d/Projects/aether-radio-sim/crates/cli)
+    Finished `release` profile [optimized] target(s) in 2m 03s
+     Running `target/release/aether-radio-sim bench --profile configs/bench_profile_cuda.yaml`
+{
+  "throughput": {
+    "gbps": 0.005816340588028076,
+    "gbs": 0.0007270425735035094,
+    "pps": 1420.0050263740418
+  },
+  "latency": {
+    "min_ns": 52844,
+    "p50_ns": 62044,
+    "p99_ns": 147750,
+    "p999_ns": 147750,
+    "max_ns": 161251
+  },
+  "radio": {
+    "slot_miss": 0,
+    "symbol_miss": 0
+  },
+  "packets": 64,
+  "bytes": 32768,
+  "sequence_gaps": 0,
+  "late_packets": 0,
+  "sim_duration_ns": 45070263,
+  "recovery_actions": 0,
+  "ring_occupancy_peak": 0
+}
+report written: ./data/reports/bench_cuda.json
+metrics: {"link":{"rx_packets":128,"tx_packets":64,"bandwidth_bps":0.0,"drop":0,"error":0},"transport":{"sequence_gap":0,"late_packet":0,"jitter_ns":11001,"latency_ns":70245},"radio":{"slot_latency_ns":0,"symbol_latency_ns":0,"deadline_miss":0}}
+bench-cuda done: see report path in profile (configs/bench_profile_cuda.yaml)

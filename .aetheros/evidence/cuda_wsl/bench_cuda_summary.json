@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-08-16T15:42:08.659055Z",
+  "status": "PASS",
+  "profile": "configs/bench_profile_cuda.yaml",
+  "packets": 64,
+  "sequence_gaps": 0,
+  "report": "data/reports/bench_cuda.json",
+  "artifact": ".aetheros/evidence/cuda_wsl/bench_cuda.json"
+}

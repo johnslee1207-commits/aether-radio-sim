@@ -69,7 +69,7 @@ GPU PHY
 |------|------------|------|----------|
 | **Metrics** | 系统现在是否健康？ | 高频、数值、聚合 | `metrics-engine::MetricsEngine`（部分字段） |
 | **Log / Event** | 发生了什么？ | 结构化事件、可检索 | `EventLogger` JSONL + `tracing`（CLI） |
-| **Trace** | 一个 packet/slot 经历了什么？ | 端到端时间戳链 | **未实现**（O-sprint 优先） |
+| **Trace** | 一个 packet/slot 经历了什么？ | 端到端时间戳链 | **已实现** — `metrics-engine::TraceEngine`（O003/O012；PipelineBench/smoke 默认开启；JSONL 导出） |
 
 禁止把三类数据混进同一无 schema 的 dump。
 
@@ -151,9 +151,11 @@ Component → MetricsExporter trait → scrape / push → Prometheus → Grafana
 
 ---
 
-## 7. Trace 体系（最高优先级缺口）
+## 7. Trace 体系（已落地；持续增强）
 
 目标：回答「一个 slot 为什么晚了？」
+
+**状态（与 coverage matrix / Sprint O 对齐）：** TraceEngine MVP 已完成（O003），并接入 PipelineBench / smoke（O012，default-on）。导出路径见 `configs/ops/observability.yaml` → `data/reports/traces/`。本节保留设计约束，供后续增强（更细 stage、采样策略）参考。
 
 每个 packet / symbol 携带或关联：
 
@@ -173,7 +175,7 @@ FPGA_TX → WIRE_DEPART → CX5_RX → DMA_DONE → HOST_READY → GPU_ENQUEUE �
 * 导出异步/离线到 `data/reports/traces/*.jsonl`；
 * 与 Metrics/Log **分离 schema**。
 
-任务编号起点：`O010` TraceEngine MVP。
+历史任务编号：`O003` TraceEngine MVP；`O012` PipelineBench/soak 接入（Done）。
 
 ---
 

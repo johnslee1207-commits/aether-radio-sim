@@ -1,14 +1,18 @@
 schema_version: 1.0.0
 surfaces:
   cursor_ide: requested
-  cursor_cli: disabled_until_smoke
-  cursor_cloud: disabled_until_smoke
+  cursor_cli: smoke_passed_local
+  cursor_cloud: disabled_until_dedicated_cloud_smoke
 requires_special_hardware: optional_cuda_wsl2
 hardware_notes:
   m1_requires_special_hardware: false
   deferred_milestones:
-    - CUDA
     - DPDK
     - FPGA
     - real_hardware
+  cuda_evidence:
+    - smoke-cuda
+    - bench_profile_cuda
 network_policy: controlled
+last_capability_smoke: .aetheros/evidence/capability_smoke_g4/summary.json
+smoke_checklist: .aetheros/capability-smoke.yaml
