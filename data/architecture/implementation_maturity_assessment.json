@@ -1,0 +1,163 @@
+{
+  "apiVersion": "aetheros.io/v1alpha1",
+  "kind": "ImplementationMaturityAssessment",
+  "metadata": {
+    "schemaVersion": "1.0.0",
+    "project_id": "aether-radio-sim",
+    "generatedAt": "2026-08-17T00:12:00Z",
+    "method": [
+      "gitnexus_analyze",
+      "observability_coverage_matrix",
+      "sprint_map",
+      "crate_inventory",
+      "aetheros_goal_evidence"
+    ]
+  },
+  "code_graph": {
+    "tool": "GitNexus",
+    "indexed_commit": "6acb5b4",
+    "indexed_at": "2026-08-17T00:10:21Z",
+    "status": "up-to-date",
+    "stats": {
+      "files": 139,
+      "nodes": 1646,
+      "edges": 2784,
+      "clusters": 105,
+      "execution_flows": 18,
+      "embeddings": 0
+    },
+    "delta_vs_prior_index": {
+      "prior_indexed_commit": "97d4ac0",
+      "prior_approx_symbols": 970,
+      "prior_approx_relationships": 1632,
+      "prior_flows": 11,
+      "note": "Re-index after G0–G7 + SHM fix grew graph substantially"
+    },
+    "flow_themes": [
+      "CLI main → metrics/events/bench report",
+      "ops-report / prom-dump / prom-serve",
+      "transport ingest / recover_after_gap",
+      "fault-injection → core types",
+      "gpu-info CUDA path"
+    ],
+    "limitations": [
+      "GitNexus MCP unavailable in session (CLI analyze/status used)",
+      "Vector/embeddings unavailable on this platform",
+      "Most communities unlabeled Cluster_N"
+    ]
+  },
+  "maturity_scale": {
+    "0": "absent",
+    "1": "stub/schema only",
+    "2": "partial",
+    "3": "usable in sim",
+    "4": "first-class with tests/gates",
+    "5": "production / hardware-ops ready"
+  },
+  "domains": [
+    {
+      "id": "workspace_ci",
+      "score": 4,
+      "evidence": "Sprint 1 Done; 16 workspace crates; GitHub CI"
+    },
+    {
+      "id": "protocol_types",
+      "score": 4,
+      "evidence": "Sprint 2 Done; aether-types/protocol"
+    },
+    {
+      "id": "fpga_emulator",
+      "score": 4,
+      "evidence": "Sprint 3 Done; software IQ/packetize"
+    },
+    {
+      "id": "transport",
+      "score": 4,
+      "evidence": "Sprint 4 Done; stream/seq/timestamp"
+    },
+    {
+      "id": "ethernet_cx5_mock",
+      "score": 4,
+      "evidence": "ethernet-model + Cx5Nic + DpdkPacketIO mock"
+    },
+    {
+      "id": "memory_gpu_sim",
+      "score": 4,
+      "evidence": "Sprint 5; gpu-runtime SimGpu"
+    },
+    {
+      "id": "gpu_cuda",
+      "score": 3.5,
+      "evidence": "Optional feature; WSL smoke-cuda + bench_cuda evidence; not default CI"
+    },
+    {
+      "id": "net_shm_io",
+      "score": 4,
+      "evidence": "UDP dual PASS; SHM dual PASS after truncate fix"
+    },
+    {
+      "id": "benchmark_fault",
+      "score": 4,
+      "evidence": "PipelineBench, accept, soak, fault-drill"
+    },
+    {
+      "id": "observability_ops",
+      "score": 4.5,
+      "evidence": "O001–O025 Done; matrix overall 4.5; Compose ops stack"
+    },
+    {
+      "id": "dpdk_hardware_adapter",
+      "score": 1.5,
+      "evidence": "G7 stub crate; hardware fail-closed; no libdpdk"
+    },
+    {
+      "id": "real_fpga_hardware",
+      "score": 0.5,
+      "evidence": "G8 acceptance contract only; blocked on hardware auth"
+    },
+    {
+      "id": "aetheros_governance",
+      "score": 3.5,
+      "evidence": "INTAKE→G0–G7 complete; cursor_cli smoke_passed_local; gates not self-approved"
+    }
+  ],
+  "aggregates": {
+    "simulation_platform_0_to_5": 4.1,
+    "observability_ops_0_to_5": 4.5,
+    "hardware_readiness_0_to_5": 1.0,
+    "governance_0_to_5": 3.5,
+    "overall_weighted_0_to_5": 3.7,
+    "weighting_note": "Simulation+ops weighted higher than hardware stubs; overall pulled down by DPDK/FPGA hardware gaps"
+  },
+  "sprint_completion": {
+    "sprints_1_to_6": "Done",
+    "sprint_o_o001_o025": "Done"
+  },
+  "gaps": [
+    {
+      "id": "G8",
+      "severity": "critical",
+      "summary": "Real FPGA/bitstream blocked on authorize_g8_hardware_lab"
+    },
+    {
+      "id": "dpdk_hardware",
+      "severity": "high",
+      "summary": "Hardware DPDK/DOCA not linked; stub only"
+    },
+    {
+      "id": "cuda_ci",
+      "severity": "medium",
+      "summary": "CUDA evidence exists but not default CI gate"
+    },
+    {
+      "id": "gitnexus_embeddings",
+      "severity": "low",
+      "summary": "Vector search unavailable; graph FTS only"
+    }
+  ],
+  "recommendation": [
+    "Treat simulation+ops plane as mature (≈4+) for continued R&D on configs/evidence",
+    "Do not claim production/hardware readiness",
+    "Next gated work: G8 only with hardware authority, or deepen DPDK adapter behind feature flag"
+  ]
+}
